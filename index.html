@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMS Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.18);
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6b66;
+    --text-muted: #aaaaa3;
+    --accent-cars: #1D9E75;
+    --accent-cars-bg: #E1F5EE;
+    --accent-med: #D85A30;
+    --accent-med-bg: #FAECE7;
+    --accent-equip: #378ADD;
+    --accent-equip-bg: #E6F1FB;
+    --accent-daily: #BA7517;
+    --accent-daily-bg: #FAEEDA;
+    --accent-incident: #A32D2D;
+    --accent-incident-bg: #FCEBEB;
+    --accent-supply: #533AB7;
+    --accent-supply-bg: #EEEDFE;
+    --accent-coverage: #3B6D11;
+    --accent-coverage-bg: #EAF3DE;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── PAGE SYSTEM ── */
+  .page { display: none; min-height: 100vh; padding: 2rem 1.25rem 3rem; max-width: 680px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── HEADER ── */
+  .header { margin-bottom: 2.5rem; }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .back-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; font-size: 16px; color: var(--text-secondary);
+    transition: all 0.15s; flex-shrink: 0;
+    text-decoration: none;
+  }
+  .back-btn:hover { border-color: var(--border-hover); background: #f0efeb; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+  .page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; padding-left: 48px; }
+  .page-subtitle.no-indent { padding-left: 0; }
+
+  /* ── SECTION ── */
+  .section-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 10px; margin-top: 2rem;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  /* ── MAIN CATEGORY CARD ── */
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.1rem 1rem;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+    display: flex; flex-direction: column; gap: 12px;
+    animation: fadeUp 0.4s ease both;
+    min-height: 130px;
+  }
+  .cat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .cat-card:active { transform: scale(0.97); }
+
+  .cat-icon {
+    width: 38px; height: 38px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .cat-name { font-weight: 500; font-size: 14px; color: var(--text-primary); line-height: 1.3; }
+  .cat-count { font-size: 12px; color: var(--text-muted); margin-top: auto; }
+
+  /* ── SUB BUTTON ── */
+  .sub-list { display: flex; flex-direction: column; gap: 8px; }
+  .sub-btn {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.1rem;
+    cursor: pointer; text-decoration: none;
+    transition: transform 0.12s, border-color 0.15s, background 0.12s;
+    animation: fadeUp 0.35s ease both;
+    color: var(--text-primary);
+  }
+  .sub-btn:hover { border-color: var(--border-hover); background: #fafaf8; transform: translateX(3px); }
+  .sub-btn:active { transform: scale(0.98); }
+
+  .sub-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .sub-label { font-size: 15px; font-weight: 500; flex: 1; }
+  .sub-arrow { font-size: 13px; color: var(--text-muted); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  /* ── PLACEHOLDER NOTE ── */
+  .placeholder-note {
+    background: #fafaf8; border: 1px dashed var(--border-hover);
+    border-radius: var(--radius-sm); padding: 1rem 1.1rem;
+    font-size: 13px; color: var(--text-muted); text-align: center;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .cat-card:nth-child(1) { animation-delay: 0.05s; }
+  .cat-card:nth-child(2) { animation-delay: 0.10s; }
+  .cat-card:nth-child(3) { animation-delay: 0.15s; }
+  .cat-card:nth-child(4) { animation-delay: 0.20s; }
+  .cat-card:nth-child(5) { animation-delay: 0.25s; }
+  .cat-card:nth-child(6) { animation-delay: 0.30s; }
+  .cat-card:nth-child(7) { animation-delay: 0.35s; }
+  .sub-btn:nth-child(1) { animation-delay: 0.05s; }
+  .sub-btn:nth-child(2) { animation-delay: 0.10s; }
+  .sub-btn:nth-child(3) { animation-delay: 0.15s; }
+  .sub-btn:nth-child(4) { animation-delay: 0.20s; }
+  .sub-btn:nth-child(5) { animation-delay: 0.25s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 400px) {
+    .cat-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     PAGE 1 — MAIN DASHBOARD
+════════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="header">
+    <div class="header-top">
+      <div class="page-title">EMS Dashboard</div>
+    </div>
+    <div class="page-subtitle no-indent">Select a category to continue</div>
+  </div>
+
+  <div class="cat-grid">
+
+    <div class="cat-card" onclick="goTo('page-cars')">
+      <div class="cat-icon" style="background:var(--accent-cars-bg)">🚑</div>
+      <div>
+        <div class="cat-name">Ambulance</div>
+        <div class="cat-count">3 vehicles</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-bags')">
+      <div class="cat-icon" style="background:var(--accent-med-bg)">🎒</div>
+      <div>
+        <div class="cat-name">Bag Check</div>
+        <div class="cat-count">5 bag types</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-campus')">
+      <div class="cat-icon" style="background:#E1F5EE">🏫</div>
+      <div>
+        <div class="cat-name">Campus</div>
+        <div class="cat-count">Golf · Bag · Equipment</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-equip')">
+      <div class="cat-icon" style="background:var(--accent-equip-bg)">🩺</div>
+      <div>
+        <div class="cat-name">Equipment</div>
+        <div class="cat-count">3 rooms</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-daily')">
+      <div class="cat-icon" style="background:var(--accent-daily-bg)">📋</div>
+      <div>
+        <div class="cat-name">Daily Report</div>
+        <div class="cat-count">Coming soon</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-incident')">
+      <div class="cat-icon" style="background:var(--accent-incident-bg)">⚠️</div>
+      <div>
+        <div class="cat-name">Incident Report</div>
+        <div class="cat-count">2 types</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-supply')">
+      <div class="cat-icon" style="background:var(--accent-supply-bg)">📦</div>
+      <div>
+        <div class="cat-name">Supply Request</div>
+        <div class="cat-count">Subcategories</div>
+      </div>
+    </div>
+
+    <div class="cat-card" onclick="goTo('page-coverage')">
+      <div class="cat-icon" style="background:var(--accent-coverage-bg)">📝</div>
+      <div>
+        <div class="cat-name">Coverage / Event Checklist</div>
+        <div class="cat-count">Placeholder</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2a — AMBULANCE
+════════════════════════════════════ -->
+<div class="page" id="page-cars">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Ambulance</div>
+    </div>
+    <div class="page-subtitle">Select an option to continue</div>
+  </div>
+
+  <div class="section-label">Daily Shift Check</div>
+  <div class="badge" style="background:var(--accent-cars-bg);color:var(--accent-cars)">🚑 3 vehicles</div>
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="launchChecklist('6552');return false;">
+      <div class="sub-dot" style="background:var(--accent-cars)"></div>
+      <span class="sub-label">Type-C 6552</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="launchChecklist('4340');return false;">
+      <div class="sub-dot" style="background:var(--accent-cars)"></div>
+      <span class="sub-label">Type-C 4340</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="launchChecklist('4341');return false;">
+      <div class="sub-dot" style="background:var(--accent-cars)"></div>
+      <span class="sub-label">Type-B 4341</span>
+      <span class="sub-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="section-label" style="margin-top:2rem">Maintenance / Forms</div>
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#e65100"></div>
+      <span class="sub-label">Ambulance Maintenance Form</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#e65100"></div>
+      <span class="sub-label">Problem Report Form</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE — CAMPUS
+════════════════════════════════════ -->
+<div class="page" id="page-campus">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Campus</div>
+    </div>
+    <div class="page-subtitle">Select a campus checklist</div>
+  </div>
+
+  <div class="badge" style="background:#E1F5EE;color:#0F6E56">🏫 Campus team</div>
+
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#1D9E75"></div>
+      <span class="sub-label">Golf Cart Check</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#1D9E75"></div>
+      <span class="sub-label">Campus Equipment Check</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="https://forms.gle/SY2xhRHHmgX8npxK" target="_blank">
+      <div class="sub-dot" style="background:#1D9E75"></div>
+      <span class="sub-label">Campus Medication Bag</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2b — BAG CHECK
+════════════════════════════════════ -->
+<div class="page" id="page-bags">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Bag Check</div>
+    </div>
+    <div class="page-subtitle">Select a bag to fill the form</div>
+  </div>
+
+  <div class="badge" style="background:var(--accent-med-bg);color:var(--accent-med)">🎒 3 bag types</div>
+
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="launchBagChecklist('daily');return false;">
+      <div class="sub-dot" style="background:var(--accent-med)"></div>
+      <span class="sub-label">Daily Medication Bags</span>
+      <span class="sub-arrow">→</span>
+    </a>
+
+
+    <a class="sub-btn" href="#" onclick="launchBackupBag();return false;">
+      <div class="sub-dot" style="background:var(--accent-med)"></div>
+      <span class="sub-label">Backup Bags</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-med)"></div>
+      <span class="sub-label">Safety Box (Narcotic)</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2c — EQUIPMENT
+════════════════════════════════════ -->
+<div class="page" id="page-equip">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Equipment</div>
+    </div>
+    <div class="page-subtitle">Select a room to fill the form</div>
+  </div>
+
+  <div class="badge" style="background:var(--accent-equip-bg);color:var(--accent-equip)">🩺 3 rooms</div>
+
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="launchEquipRoom1();return false;">
+      <div class="sub-dot" style="background:var(--accent-equip)"></div>
+      <span class="sub-label">Equipment Room 1</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="launchEquipRoom2();return false;">
+      <div class="sub-dot" style="background:var(--accent-equip)"></div>
+      <span class="sub-label">Equipment Room 2</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="launchO2Room();return false;">
+      <div class="sub-dot" style="background:#1D9E75"></div>
+      <span class="sub-label">Oxygen Room</span>
+      <span class="sub-arrow">→</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2d — DAILY REPORT
+════════════════════════════════════ -->
+<div class="page" id="page-daily">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Daily Report</div>
+    </div>
+    <div class="page-subtitle">Coming soon</div>
+  </div>
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-daily)"></div>
+      <span class="sub-label">Daily Report Form</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2e — INCIDENT REPORT
+════════════════════════════════════ -->
+<div class="page" id="page-incident">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Incident Report</div>
+    </div>
+    <div class="page-subtitle">Select the type of incident to report</div>
+  </div>
+
+  <div class="badge" style="background:var(--accent-incident-bg);color:var(--accent-incident)">⚠️ 2 incident types</div>
+
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-incident)"></div>
+      <span class="sub-label">Problem happened without official email</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#BA7517"></div>
+      <span class="sub-label">Something found missing</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2f — SUPPLY REQUEST
+════════════════════════════════════ -->
+<div class="page" id="page-supply">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Supply Request</div>
+    </div>
+    <div class="page-subtitle">Select a subcategory</div>
+  </div>
+
+  <div class="badge" style="background:var(--accent-supply-bg);color:var(--accent-supply)">📦 Supply forms</div>
+
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-supply)"></div>
+      <span class="sub-label">Subcategory 1 — add your name</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-supply)"></div>
+      <span class="sub-label">Subcategory 2 — add your name</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+
+  <div class="placeholder-note" style="margin-top:1rem">
+    Tell me your supply subcategories and I'll update these labels.
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2g — COVERAGE / EVENT
+════════════════════════════════════ -->
+<div class="page" id="page-coverage">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Coverage / Event Checklist</div>
+    </div>
+    <div class="page-subtitle">Select a checklist to fill</div>
+  </div>
+
+  <div class="badge" style="background:var(--accent-coverage-bg);color:var(--accent-coverage)">📝 Checklists</div>
+  <div class="sub-list">
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:var(--accent-coverage)"></div>
+      <span class="sub-label">Coverage / Event Form</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+    <a class="sub-btn" href="https://forms.gle/zFKD83upU6d7em9z7" target="_blank">
+      <div class="sub-dot" style="background:var(--accent-coverage)"></div>
+      <span class="sub-label">Coverage Bag</span>
+      <span class="sub-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     COMING SOON PAGE
+════════════════════════════════════ -->
+<div class="page" id="page-soon">
+  <div class="header">
+    <div class="header-top">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="page-title">Oops! 😅</div>
+    </div>
+  </div>
+  <div style="text-align:center; padding: 1rem 0 2rem;">
+    <div style="font-size: 80px; margin-bottom: 1.5rem; animation: bounce 1s infinite alternate;">🚧</div>
+    <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text-primary); margin-bottom: 0.75rem;">
+      Coming Soon!
+    </div>
+    <div style="font-size:15px; color:var(--text-secondary); margin-bottom: 0.5rem;">
+      This form isn't ready yet.
+    </div>
+    <div style="font-size:13px; color:var(--text-muted); margin-bottom: 2.5rem;">
+      Our team is working on it 👷
+    </div>
+    <div style="display:inline-block; background:#1a1a18; color:#fff; font-size:12px; font-weight:500; padding: 8px 18px; border-radius:20px; letter-spacing:0.05em;">
+      — M.A Solutions —
+    </div>
+  </div>
+  <style>
+    @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+  </style>
+</div>
+
+
+<script>
+  const history = ['page-home'];
+
+  function goTo(pageId) {
+    document.querySelector('.page.active').classList.remove('active');
+    document.getElementById(pageId).classList.add('active');
+    history.push(pageId);
+    window.scrollTo(0, 0);
+  }
+
+  function goBack() {
+    if (history.length <= 1) return;
+    history.pop();
+    document.querySelector('.page.active').classList.remove('active');
+    document.getElementById(history[history.length - 1]).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function launchChecklist(unit) {
+    document.getElementById('chk-overlay').style.display = 'flex';
+    document.getElementById('amb-unit-display').textContent = 'Unit ' + unit;
+    document.getElementById('amb-unit-val').value = unit;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('amb-date').value = today;
+    document.getElementById('als-date').value = today;
+    chkSwitchTab('amb');
+    window.scrollTo(0, 0);
+  }
+
+  function closeChecklist() {
+    document.getElementById('chk-overlay').style.display = 'none';
+  }
+</script>
+
+<!-- ═══════════════ CHECKLIST OVERLAY ═══════════════ -->
+<div id="chk-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#f0f2f5;overflow-y:auto">
+<style>
+#chk-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#chk-overlay .ch{background:#1a3a5c;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#chk-overlay .ch button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700;flex-shrink:0}
+#chk-overlay .tabs{display:flex;background:#1a3a5c}
+#chk-overlay .tab{flex:1;padding:11px 4px;border:none;background:transparent;color:rgba(255,255,255,.55);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent}
+#chk-overlay .tab.on{color:#fff;border-bottom:3px solid #e8b84b}
+#chk-overlay .scr{display:none}
+#chk-overlay .scr.on{display:block}
+#chk-overlay .fh{background:#1a3a5c;color:#fff;padding:9px 13px;display:flex;justify-content:space-between;align-items:center}
+#chk-overlay .fh h2{font-size:12px;font-weight:700;opacity:.9}
+#chk-overlay .fh h3{font-size:10px;opacity:.6;margin-top:1px}
+#chk-overlay .mg{background:#fff;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #ddd}
+#chk-overlay .mc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#chk-overlay .mc:last-child{border-right:none}
+#chk-overlay .ml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#chk-overlay .mc input,#chk-overlay .mc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#chk-overlay .sh{background:#1a3a5c;color:#fff;text-align:center;padding:6px 10px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+#chk-overlay .sh.red{background:#8b1a1a}
+#chk-overlay .pw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
+#chk-overlay .pt{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+#chk-overlay .pf{height:5px;background:#1a3a5c;border-radius:99px;transition:width .3s}
+#chk-overlay .px{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+#chk-overlay .mr{background:#fff;padding:8px 10px;border-bottom:0.5px solid #eee;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#chk-overlay .chip{display:inline-flex;align-items:center;padding:8px 12px;border-radius:7px;border:1.5px solid #ccc;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#555;cursor:pointer;transition:background .15s,border-color .15s,color .15s;user-select:none;margin:0}
+#chk-overlay .chip.found{background:#e8f5e9 !important;border-color:#2e7d32 !important;color:#2e7d32 !important}
+#chk-overlay .chip.notfound{background:#ffebee !important;border-color:#c62828 !important;color:#c62828 !important}
+#chk-overlay .sg{background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:1px;border-bottom:0.5px solid #eee}
+#chk-overlay .sc{padding:8px 10px;border-right:0.5px solid #eee}
+#chk-overlay .sc:last-child{border-right:none}
+#chk-overlay .st{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+#chk-overlay .sn{font-family:inherit;font-size:14px;font-weight:700;border:none;border-bottom:2px solid #1a3a5c;outline:none;width:100%;padding:2px 0;color:#1a3a5c;background:transparent}
+#chk-overlay .ob{padding:9px 9px;border-radius:7px;border:1.5px solid #ddd;background:#f8f9fa;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;text-align:center;transition:all .12s}
+#chk-overlay .ob.sg{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#chk-overlay .ob.sr{background:#ffebee;border-color:#c62828;color:#c62828}
+#chk-overlay .ob.sa{background:#fff8e1;border-color:#e65100;color:#e65100}
+#chk-overlay .bb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:7px}
+#chk-overlay .bb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#chk-overlay .nr{background:#fff;padding:9px 10px;border-bottom:0.5px solid #eee}
+#chk-overlay .nr label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+#chk-overlay .nr textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:50px;outline:none;color:#1a1a1a;background:#fafafa}
+#chk-overlay .toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+#chk-overlay .le{background:#fff;border-radius:9px;padding:11px 13px;margin-bottom:8px;border:0.5px solid #eee}
+#chk-overlay .lm{font-size:10px;color:#888;margin-bottom:2px}
+#chk-overlay .lt{font-size:13px;font-weight:700;margin-bottom:5px}
+#chk-overlay .tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;display:inline-block;margin:2px}
+#chk-overlay .ca{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-family:inherit;font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer;float:right;margin-top:-1px}
+#chk-overlay .ca:active{opacity:.7}
+</style>
+
+<div class="ch">
+  <button onclick="closeChecklist()">&#8592;</button>
+  <div style="flex:1">
+    <div style="font-size:14px;font-weight:800" id="chk-unit-label">Ambulance Check</div>
+    <div style="font-size:10px;opacity:.7">EMS KAAUH</div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab on" id="chk-tab-amb" onclick="chkTab('amb')">&#128657; Ambulance</button>
+  <button class="tab" id="chk-tab-als" onclick="chkTab('als')">&#127920; ALS Bag</button>
+  <button class="tab" id="chk-tab-logs" onclick="chkTab('logs')">&#128203; Logs</button>
+</div>
+
+<!-- AMBULANCE -->
+<div class="scr on" id="chk-scr-amb">
+<div class="fh"><div><h2>AMBULANCE CHECKLIST</h2><h3>EMS KAAUH LOGISTICS</h3></div><div style="background:#e8b84b;color:#1a3a5c;font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px">KAAUH</div></div>
+<div class="mg">
+  <div class="mc"><span class="ml">Date</span><input type="date" id="a-date"></div>
+  <div class="mc"><span class="ml">Shift</span><select id="a-shift"><option value="">--</option><option>P Day</option><option>N Night</option></select></div>
+  <div class="mc"><span class="ml">Time</span><input type="time" id="a-time"></div>
+</div>
+<div class="mg" style="grid-template-columns:1fr 1fr">
+  <div class="mc"><span class="ml">Name</span><input type="text" id="a-name" placeholder="Full name"></div>
+  <div class="mc"><span class="ml">ID</span><input type="text" id="a-id" placeholder="ID"></div>
+</div>
+<input type="hidden" id="a-unit">
+<div class="pw"><div class="pt"><div class="pf" id="a-pf" style="width:0%"></div></div><div class="px"><span id="a-pt">0 of 0 checked</span><span id="a-pp">0%</span></div></div>
+
+<div class="sh">Patient Compartment<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr" style="gap:0;padding:0;overflow-x:auto;flex-wrap:nowrap">
+  <div style="padding:9px 10px;display:flex;flex-direction:column;gap:5px;border-right:1.5px solid #e0e0e0">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase">1 Stryker</span>
+    <div style="display:flex;gap:5px">
+      <button class="chip" onclick="tap(this)">Hydraulic</button>
+      <button class="chip" onclick="tap(this)">Manual</button>
+    </div>
+  </div>
+  <div style="padding:9px 10px;display:flex;flex-direction:column;gap:5px;border-right:1.5px solid #e0e0e0">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase">HEPA</span>
+    <div style="display:flex;gap:5px">
+      <button class="chip" onclick="tap(this)">HEPA Filter</button>
+      <button class="chip" onclick="tap(this)">Batteries</button>
+    </div>
+  </div>
+  <div style="padding:9px 10px;display:flex;flex-direction:column;gap:5px">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase">Linen</span>
+    <div style="display:flex;gap:5px">
+      <button class="chip" onclick="tap(this)">Sheet</button>
+      <button class="chip" onclick="tap(this)">Blanket</button>
+    </div>
+  </div>
+</div>
+
+<div class="sh">Oxygen</div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex">
+  <div style="flex:1;padding:9px 10px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:7px">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase">Wall Mounted O&#x2082;</span>
+    <div style="display:flex;align-items:center;gap:5px"><input type="text" id="o2w" placeholder="000" oninput="chkO2Wall(this)" style="font-family:inherit;font-size:20px;font-weight:700;border:none;border-bottom:2px solid #1a3a5c;outline:none;width:65px;text-align:center;color:#1a3a5c;background:transparent">
+<span id="o2w-warn" style="display:none;font-size:10px;font-weight:700;color:#c62828;background:#ffebee;border-radius:5px;padding:2px 6px;margin-top:3px">&#9888; Needs replacing</span><span style="font-size:11px;color:#888;font-weight:600">L/PSI</span></div>
+    <div style="border-top:0.5px solid #eee;padding-top:6px"><span style="font-size:9px;font-weight:700;color:#888;display:block;margin-bottom:4px">Flow Meter &amp; Circuit</span>
+    <div style="display:flex;flex-wrap:wrap;gap:4px"><button class="chip" onclick="tap(this)">Flow Meter</button><button class="chip" onclick="tap(this)">Circuit A</button><button class="chip" onclick="tap(this)">Circuit P</button></div></div>
+  </div>
+  <div style="flex:1;padding:9px 10px;display:flex;flex-direction:column;gap:7px">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase">Portable O&#x2082;</span>
+    <div style="display:flex;align-items:center;gap:5px"><input type="text" id="o2p" placeholder="000" style="font-family:inherit;font-size:20px;font-weight:700;border:none;border-bottom:2px solid #1a3a5c;outline:none;width:65px;text-align:center;color:#1a3a5c;background:transparent"><span style="font-size:11px;color:#888;font-weight:600">L/PSI</span></div>
+    <div style="border-top:0.5px solid #eee;padding-top:6px"><span style="font-size:9px;font-weight:700;color:#888;display:block;margin-bottom:4px">Cylinder &amp; Air</span>
+    <div style="display:flex;flex-wrap:wrap;gap:4px"><button class="chip" onclick="tap(this)">D</button><button class="chip" onclick="tap(this)">K</button><button class="chip" onclick="tap(this)">Medical Air</button><button class="chip" onclick="tap(this)">O&#x2082; Bag</button></div></div>
+  </div>
+</div>
+
+<div class="sh">Devices<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr"><button class="chip" onclick="tap(this)">LUCAS V.3</button><button class="chip" onclick="tap(this)">Charger</button><button class="chip" onclick="tap(this)">Suction Wall</button><button class="chip" onclick="tap(this)">Suction Portable</button><button class="chip" onclick="tap(this)">EMS Fridge</button><button class="chip" onclick="tap(this)">Wall Mounted BP</button></div>
+
+<div class="sh">Zoll Defibrillator<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr"><button class="chip" onclick="tap(this)">Zoll Unit</button><button class="chip" onclick="tap(this)">BP Cuff A</button><button class="chip" onclick="tap(this)">BP Cuff P</button><button class="chip" onclick="tap(this)">Pulse Oximeter</button><button class="chip" onclick="tap(this)">Paddles A</button><button class="chip" onclick="tap(this)">Paddles P</button><button class="chip" onclick="tap(this)">Leads Limb</button><button class="chip" onclick="tap(this)">Leads Chest</button><button class="chip" onclick="tap(this)">Record Paper</button></div>
+
+<div class="sh">Sealed Cabinets</div>
+<div class="sg">
+  <div class="sc"><div class="st">Ventilation</div><input class="sn" type="number" placeholder="Seal number" inputmode="numeric"></div>
+  <div class="sc"><div class="st">Airway</div><input class="sn" type="number" placeholder="Seal number" inputmode="numeric"></div>
+  <div class="sc"><div class="st">IV/IO</div><input class="sn" type="number" placeholder="Seal number" inputmode="numeric"></div>
+  <div class="sc"><div class="st">OB Cabinet</div><input class="sn" type="number" placeholder="Seal number" inputmode="numeric"></div>
+  <div class="sc" style="grid-column:1/-1;border-right:none"><div class="st">Dressing</div><input class="sn" type="number" placeholder="Seal number" inputmode="numeric"></div>
+</div>
+
+<div class="sh">Splinting / Boards<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr"><button class="chip" onclick="tap(this)">Traction A</button><button class="chip" onclick="tap(this)">Traction P</button><button class="chip" onclick="tap(this)">Vacuum L</button><button class="chip" onclick="tap(this)">Vacuum S</button><button class="chip" onclick="tap(this)">Arm Sling</button><button class="chip" onclick="tap(this)">Folding Stretcher</button><button class="chip" onclick="tap(this)">Stair Chair</button><button class="chip" onclick="tap(this)">Back Board</button><button class="chip" onclick="tap(this)">Back Board P</button><button class="chip" onclick="tap(this)">Spider Straps</button><button class="chip" onclick="tap(this)">SAMS</button><button class="chip" onclick="tap(this)">KED</button><button class="chip" onclick="tap(this)">C-Collar</button><button class="chip" onclick="tap(this)">Head Immobilizer</button><button class="chip" onclick="tap(this)">Scoop</button><button class="chip" onclick="tap(this)">Vacuum Splint Pump</button><button class="chip" onclick="tap(this)">Padded Splint</button></div>
+
+<div class="sh">PPE's</div>
+<div class="mr"><button class="chip" onclick="tap(this)">Vomit Bag</button><button class="chip" onclick="tap(this)">Goggles</button><button class="chip" onclick="tap(this)">Gloves S</button><button class="chip" onclick="tap(this)">Gloves M</button><button class="chip" onclick="tap(this)">Gloves L</button><button class="chip" onclick="tap(this)">Disp. Mask</button><button class="chip" onclick="tap(this)">Iso. Gown</button><button class="chip" onclick="tap(this)">N95</button></div>
+
+<div class="sh">Vehicle Condition</div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex">
+  <div style="flex:1;padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:5px">
+    <span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase;text-align:center">Fuel Level</span>
+    <button class="ob" onclick="selOpt(this,'fuel','sg')">Full</button>
+    <button class="ob" onclick="selOpt(this,'fuel','sa')">3/4</button>
+    <button class="ob" onclick="selOpt(this,'fuel','sa')">1/2</button>
+    <button class="ob" onclick="selOpt(this,'fuel','sr')">1/4 or less</button>
+  </div>
+  <div style="flex:2;padding:9px 9px;display:flex;flex-direction:column;gap:7px">
+    <div><span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase;display:block;margin-bottom:4px">Tire Safety</span>
+    <div style="display:flex;gap:5px"><button class="ob" style="flex:1" onclick="selOpt(this,'tire','sg')">Safe</button><button class="ob" style="flex:1" onclick="selOpt(this,'tire','sr')">Unsafe</button></div></div>
+    <div style="border-top:0.5px solid #eee;padding-top:7px"><span style="font-size:9px;font-weight:800;color:#1a3a5c;text-transform:uppercase;display:block;margin-bottom:5px">Condition</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+      <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">Inside</div><div style="display:flex;gap:3px"><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'inside','sg')">Clean</button><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'inside','sr')">Dirty</button></div></div>
+      <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">Outside</div><div style="display:flex;gap:3px"><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'outside','sg')">Clean</button><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'outside','sr')">Dirty</button></div></div>
+      <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">Trash</div><div style="display:flex;gap:3px"><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'trash','sg')">Empty</button><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'trash','sr')">Full</button></div></div>
+      <div><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">Sharp Cont.</div><div style="display:flex;gap:3px"><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'sharp','sg')">Empty</button><button class="ob" style="flex:1;padding:7px 3px;font-size:11px" onclick="selOpt(this,'sharp','sr')">Full</button></div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="nr"><label>Notes</label><textarea id="a-notes" placeholder="Any notes..."></textarea></div>
+<div class="bb">
+  <button style="background:#1a3a5c;color:#fff" onclick="chkSave('amb')">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="chkTab('logs')">Logs</button>
+  <button style="background:#eee;color:#333" onclick="chkReset('amb')">Reset</button>
+</div>
+</div>
+
+<!-- ALS BAG -->
+<div class="scr" id="chk-scr-als">
+<div class="fh" style="background:#8b1a1a"><div><h2>ALS BAG CHECKLIST</h2><h3>EMS KAAUH LOGISTICS</h3></div><div style="background:#e8b84b;color:#8b1a1a;font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px">ALS</div></div>
+<div class="mg">
+  <div class="mc"><span class="ml">Date</span><input type="date" id="b-date"></div>
+  <div class="mc"><span class="ml">Shift</span><select id="b-shift"><option value="">--</option><option>P Day</option><option>N Night</option></select></div>
+  <div class="mc"><span class="ml">Name</span><input type="text" id="b-name" placeholder="Name"></div>
+</div>
+<div class="pw"><div class="pt"><div class="pf" id="b-pf" style="width:0%;background:#8b1a1a"></div></div><div class="px"><span id="b-pt">0 of 0 checked</span><span id="b-pp">0%</span></div></div>
+
+<div class="sh red">Airway<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex;flex-wrap:wrap">
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">OPA</span><div style="display:flex;flex-wrap:wrap;gap:4px"><button class="chip" onclick="tap(this)">0</button><button class="chip" onclick="tap(this)">1</button><button class="chip" onclick="tap(this)">2</button><button class="chip" onclick="tap(this)">3</button><button class="chip" onclick="tap(this)">4</button></div></div>
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">NPA</span><div style="display:flex;flex-wrap:wrap;gap:4px"><button class="chip" onclick="tap(this)">6</button><button class="chip" onclick="tap(this)">7</button><button class="chip" onclick="tap(this)">7.5</button><button class="chip" onclick="tap(this)">8</button><button class="chip" onclick="tap(this)">8.5</button><button class="chip" onclick="tap(this)">9</button></div></div>
+  <div style="padding:9px 9px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Other</span><button class="chip" onclick="tap(this)">Yankauer</button></div>
+</div>
+
+<div class="sh red">Ventilation<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex;flex-wrap:wrap">
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">FM</span><button class="chip" onclick="tap(this)">Adult</button><button class="chip" onclick="tap(this)">Paed</button></div>
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">NC</span><button class="chip" onclick="tap(this)">Adult</button><button class="chip" onclick="tap(this)">Paed</button></div>
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">NRM</span><button class="chip" onclick="tap(this)">Adult</button><button class="chip" onclick="tap(this)">Paed</button></div>
+  <div style="padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">NEB</span><button class="chip" onclick="tap(this)">Adult</button><button class="chip" onclick="tap(this)">Paed</button></div>
+  <div style="padding:9px 9px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Other</span><button class="chip" onclick="tap(this)">BVM</button><button class="chip" onclick="tap(this)">O&#x2082; Tube</button></div>
+</div>
+
+<div class="sh red">IV Supplies<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr"><button class="chip" onclick="tap(this)">16G</button><button class="chip" onclick="tap(this)">18G</button><button class="chip" onclick="tap(this)">20G</button><button class="chip" onclick="tap(this)">22G</button><button class="chip" onclick="tap(this)">24G</button><button class="chip" onclick="tap(this)">26G</button><button class="chip" onclick="tap(this)">IV Infusion Set</button><button class="chip" onclick="tap(this)">Needles</button><button class="chip" onclick="tap(this)">Tourniquet</button><button class="chip" onclick="tap(this)">IV Securement</button><button class="chip" onclick="tap(this)">Alcohol Swab</button><button class="chip" onclick="tap(this)">Ice Packs</button><button class="chip" onclick="tap(this)">Tape</button><button class="chip" onclick="tap(this)">Syringes</button><button class="chip" onclick="tap(this)">Paramedic Shears</button><button class="chip" onclick="tap(this)">Posi Flush</button><button class="chip" onclick="tap(this)">3-Way+IV Ext</button><button class="chip" onclick="tap(this)">Gauze 5x5</button><button class="chip" onclick="tap(this)">Sharps Container</button></div>
+
+<div class="sh red">Dressing Materials<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div class="mr"><button class="chip" onclick="tap(this)">Dressing Pack</button><button class="chip" onclick="tap(this)">Elastic 10</button><button class="chip" onclick="tap(this)">Elastic 8</button><button class="chip" onclick="tap(this)">Elastic 5</button><button class="chip" onclick="tap(this)">Sterile 10x10</button><button class="chip" onclick="tap(this)">Sterile 5x5</button><button class="chip" onclick="tap(this)">ECG Electrodes</button><button class="chip" onclick="tap(this)">Tubular Bandage</button><button class="chip" onclick="tap(this)">Band Aid</button><button class="chip" onclick="tap(this)">Eye Pads</button><button class="chip" onclick="tap(this)">Betadine Stick</button><button class="chip" onclick="tap(this)">Burn Pads</button><button class="chip" onclick="tap(this)">Thermal Blanket</button><button class="chip" onclick="tap(this)">TAC Tourniquet</button><button class="chip" onclick="tap(this)">ECG Pads A</button><button class="chip" onclick="tap(this)">ECG Pads P</button><button class="chip" onclick="tap(this)">Tongue Depressor</button></div>
+
+<div class="sh red">Intubation Kit<button class="ca" onclick="checkAll(this)">Check all</button></div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex;flex-wrap:wrap">
+  <div style="flex:1;min-width:90px;padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Laryngoscope</span><button class="chip" onclick="tap(this)">Unit</button><button class="chip" onclick="tap(this)">Miller</button><button class="chip" onclick="tap(this)">Macintosh</button><button class="chip" onclick="tap(this)">Batteries</button></div>
+  <div style="flex:1;min-width:90px;padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">ETT</span><button class="chip" onclick="tap(this)">ETT 7</button><button class="chip" onclick="tap(this)">ETT 8</button><button class="chip" onclick="tap(this)">ETT Secure</button></div>
+  <div style="flex:1;min-width:90px;padding:9px 9px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Accessories</span><button class="chip" onclick="tap(this)">Syringe</button><button class="chip" onclick="tap(this)">Stylet</button><button class="chip" onclick="tap(this)">Jell Lube</button><button class="chip" onclick="tap(this)">Miguel Forceps</button></div>
+</div>
+
+<div class="sh red">Devices</div>
+<div style="background:#fff;border-bottom:0.5px solid #eee;display:flex">
+  <div style="flex:1;padding:9px 9px;border-right:1.5px solid #e0e0e0;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Glucometer</span><button class="chip" onclick="tap(this)">Kit</button><button class="chip" onclick="tap(this)">Needle</button><button class="chip" onclick="tap(this)">Strip</button></div>
+  <div style="flex:1;padding:9px 9px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:800;color:#8b1a1a;text-transform:uppercase">Thermometer</span><button class="chip" onclick="tap(this)">Welch Allyn Probe</button><button class="chip" onclick="tap(this)">Welch Allyn Cover</button><button class="chip" onclick="tap(this)">Digital</button></div>
+</div>
+
+<div class="nr"><label>Notes</label><textarea id="b-notes" placeholder="Any notes..."></textarea></div>
+<div class="bb">
+  <button style="background:#8b1a1a;color:#fff" onclick="chkSave('als')">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="chkTab('logs')">Logs</button>
+  <button style="background:#eee;color:#333" onclick="chkReset('als')">Reset</button>
+</div>
+</div>
+
+<!-- LOGS -->
+<div class="scr" id="chk-scr-logs">
+  <div style="padding:10px 12px">
+    <div id="chk-log-list"></div>
+    <button onclick="chkClearLogs()" style="margin-top:10px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:100%;cursor:pointer">Clear all logs</button>
+  </div>
+</div>
+
+<div class="toast" id="chk-toast"></div>
+</div>
+
+<script>
+const SHEETS_URL='https://script.google.com/macros/s/AKfycbygoWim7L_U3PICVSmkQxGqF5HcmaBsHhpPdkDtKAapiw4c4kXCcBSGQzCnS0jVMnEhcA/exec';
+const AMB_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vSAy0WK_vzO6cJnhGjv8tT7TVRFbxbF-5d3Zp7DGI78KH9Oz7BLZhcuw3Y36DpZRmuYUQmjQ9gw3p9w/pub?gid=0&single=true&output=csv';
+const DAILY_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vS_5sY6dSkmAArbpxuHXqAMKPah4zmIEfB4gbQeAFpn-D8yyJ4Upbj5XQyuygZvtgIAIvQ0RSOXrP3_/pub?gid=0&single=true&output=csv';
+const BACKUP_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQk7-Nvwvjklq94HxttnRSZ3ovpIxR9w9K6e83DtTP6sjObGQ7lg2hPLjhp9-PNiyEed8TuJajToN53/pub?gid=0&single=true&output=csv';
+const EQUIP_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vRdkzWUtOvOKDN3gxfwvP3yVT7LNevDWtj8k0GjmUdWY8MhaLSkfuxKQM3Ol8wrZUJG1bytElNRi3MY/pub?gid=0&single=true&output=csv';
+
+// Helper: parse CSV text into array of objects
+function parseCSV(text){
+  const lines = text.trim().split('\n');
+  if(lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  const dataLines = lines.slice(1).filter(l=>l.trim()!='').reverse().slice(0,30);
+  return dataLines.map(line=>{
+    // Handle quoted fields with commas inside
+    const vals = [];
+    let cur = '', inQ = false;
+    for(let i=0; i<line.length; i++){
+      const c = line[i];
+      if(c==='"') { inQ=!inQ; }
+      else if(c===',' && !inQ){ vals.push(cur.trim()); cur=''; }
+      else { cur+=c; }
+    }
+    vals.push(cur.trim());
+    const obj={};
+    headers.forEach((h,i)=>{ obj[h]=(vals[i]||'').replace(/^"|"$/g,'').trim(); });
+    return obj;
+  });
+}
+let chkCurTab='amb';
+
+function checkAll(btn){
+  const section = btn.closest('.sh').nextElementSibling;
+  if(!section) return;
+  const chips = section.querySelectorAll('.chip');
+  const allFound = [...chips].every(c=>c.classList.contains('found'));
+  chips.forEach(c=>{
+    c.classList.remove('found','notfound');
+    if(!allFound) c.classList.add('found');
+  });
+  btn.textContent = allFound ? 'Check all' : 'Uncheck all';
+  chkProg(chkCurTab);
+}
+
+function chkO2Wall(inp){
+  const val = parseInt(inp.value);
+  const warn = document.getElementById('o2w-warn');
+  if(!isNaN(val) && val < 600){
+    inp.style.color='#c62828';
+    inp.style.borderBottomColor='#c62828';
+    warn.style.display='inline-block';
+  } else {
+    inp.style.color='#1a3a5c';
+    inp.style.borderBottomColor='#1a3a5c';
+    warn.style.display='none';
+  }
+}
+
+function launchChecklist(unit){
+  // Reset ambulance form fully for new car
+  const ambScr = document.getElementById('chk-scr-amb');
+  const alsScr = document.getElementById('chk-scr-als');
+
+  // Clear all chips
+  ambScr.querySelectorAll('.chip').forEach(c=>c.classList.remove('found','notfound'));
+  alsScr.querySelectorAll('.chip').forEach(c=>c.classList.remove('found','notfound'));
+
+  // Clear option buttons
+  ambScr.querySelectorAll('.ob').forEach(b=>b.classList.remove('sg','sr','sa'));
+
+  // Clear all text inputs and textareas (except date)
+  ambScr.querySelectorAll('input[type=text],input[type=number],input[type=time],textarea').forEach(e=>e.value='');
+  alsScr.querySelectorAll('input[type=text],input[type=number],textarea').forEach(e=>e.value='');
+  ambScr.querySelectorAll('select').forEach(e=>e.value='');
+  alsScr.querySelectorAll('select').forEach(e=>e.value='');
+
+  // Reset O2 warning
+  const o2w = document.getElementById('o2w');
+  const o2warn = document.getElementById('o2w-warn');
+  if(o2w){o2w.style.color='#1a3a5c';o2w.style.borderBottomColor='#1a3a5c';}
+  if(o2warn) o2warn.style.display='none';
+
+  // Set unit and date
+  document.getElementById('a-unit').value=unit;
+  document.getElementById('chk-unit-label').textContent='Unit '+unit;
+  document.getElementById('a-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('b-date').value=new Date().toISOString().split('T')[0];
+
+  // Update progress
+  chkProg('amb');
+  chkProg('als');
+
+  document.getElementById('chk-overlay').style.display='block';
+  chkTab('amb');
+  document.getElementById('chk-overlay').scrollTop=0;
+}
+
+function closeChecklist(){
+  document.getElementById('chk-overlay').style.display='none';
+}
+
+function chkTab(t){
+  chkCurTab=t;
+  ['amb','als','logs'].forEach(x=>{
+    document.getElementById('chk-tab-'+x).classList.toggle('on',x===t);
+    document.getElementById('chk-scr-'+x).classList.toggle('on',x===t);
+  });
+  if(t==='logs') renderChkLogs();
+  else chkProg(t);
+  document.getElementById('chk-overlay').scrollTop=0;
+}
+
+function tap(btn){
+  if(btn.classList.contains('found')){
+    btn.classList.remove('found');
+    btn.classList.add('notfound');
+  } else if(btn.classList.contains('notfound')){
+    btn.classList.remove('notfound');
+  } else {
+    btn.classList.add('found');
+  }
+  chkProg(chkCurTab);
+}
+
+function selOpt(btn,group,cls){
+  const btns=btn.closest('div').querySelectorAll('.ob');
+  btns.forEach(b=>{b.classList.remove('sg','sr','sa');});
+  btn.classList.add(cls);
+}
+
+function chkProg(tab){
+  const scr=document.getElementById('chk-scr-'+tab);
+  if(!scr)return;
+  const all=scr.querySelectorAll('.chip');
+  const total=all.length;
+  const found=scr.querySelectorAll('.chip.found').length;
+  const notfound=scr.querySelectorAll('.chip.notfound').length;
+  const done=found+notfound;
+  const pct=total?Math.round(done/total*100):0;
+  const pre=tab==='amb'?'a':'b';
+  const fill=document.getElementById(pre+'-pf');
+  if(fill){fill.style.width=pct+'%';fill.style.background=pct===100?'#2e7d32':(tab==='als'?'#8b1a1a':'#1a3a5c');}
+  const txt=document.getElementById(pre+'-pt');
+  if(txt)txt.textContent=done+' of '+total+' checked (✓'+found+' found ✗'+notfound+' not found)';
+  const pctEl=document.getElementById(pre+'-pp');
+  if(pctEl)pctEl.textContent=pct+'%';
+}
+
+function chkSave(tab){
+  const pre=tab==='amb'?'a':'b';
+  const name=document.getElementById(pre+'-name').value.trim();
+  if(!name){chkToast('⚠ Enter your name first');return;}
+  const scr=document.getElementById('chk-scr-'+tab);
+  const untapped=[...scr.querySelectorAll('.chip')].filter(c=>!c.classList.contains('found')&&!c.classList.contains('notfound'));
+  if(untapped.length){
+    const names=untapped.slice(0,5).map(c=>c.textContent.trim()).join(', ');
+    const more=untapped.length>5?' and '+(untapped.length-5)+' more':'';
+    if(!confirm('⚠ '+untapped.length+' items not marked yet:\n'+names+more+'\n\nSubmit anyway?')) return;
+  }
+  if(tab==='amb'){
+    const seals=scr.querySelectorAll('.sn');
+    const missing=[];
+    const labels=['Ventilation','Airway','IV/IO','OB','Dressing'];
+    seals.forEach((s,i)=>{if(!s.value.trim())missing.push(labels[i]);});
+    if(missing.length){
+      if(!confirm('⚠ Missing seal numbers: '+missing.join(', ')+'\n\nSubmit anyway?')) return;
+    }
+  }
+  const notFoundItems=[...scr.querySelectorAll('.chip.notfound')].map(c=>c.textContent.trim());
+  const data={
+    type:tab==='amb'?'Ambulance':'ALS Bag',
+    unit:document.getElementById('a-unit')?.value||'',
+    date:document.getElementById(pre+'-date').value,
+    shift:document.getElementById(pre+'-shift').value,
+    name,
+    id:document.getElementById('a-id')?.value||'',
+    status:'COMPLETE',
+    not_found_count:notFoundItems.length,
+    not_found_list:notFoundItems.join(', '),
+    notes:document.getElementById(pre+'-notes').value,
+  };
+  if(tab==='amb'){
+    data.o2_wall_level=document.getElementById('o2w').value;
+    data.o2_portable_level=document.getElementById('o2p').value;
+    const seals=scr.querySelectorAll('.sn');
+    ['vent_seal_num','airway_seal_num','ivio_seal_num','ob_seal_num','dressing_seal_num'].forEach((k,i)=>data[k]=seals[i]?.value||'');
+    scr.querySelectorAll('.chip').forEach(c=>{
+      const key=c.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g,'_');
+      data[key]=c.classList.contains('found')?'YES':c.classList.contains('notfound')?'NOT FOUND':'';
+    });
+    const fuel=[...document.querySelectorAll('#chk-scr-amb .ob')].find(b=>b.classList.contains('sg')||b.classList.contains('sr')||b.classList.contains('sa'));
+    data.amb_notes=data.notes;
+    data.amb_pct=document.getElementById('a-pp').textContent;
+  } else {
+    scr.querySelectorAll('.chip').forEach(c=>{
+      const key=c.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g,'_');
+      data[key]=c.classList.contains('found')?'YES':c.classList.contains('notfound')?'NOT FOUND':'';
+    });
+    data.als_notes=data.notes;
+    data.als_pct=document.getElementById('b-pp').textContent;
+  }
+  let logs=chkGetLogs();
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>60)logs=logs.slice(0,60);
+  localStorage.setItem('ems_v3',JSON.stringify(logs));
+  fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(()=>chkToast(notFoundItems.length>0?'✅ Complete! '+notFoundItems.length+' not found':'✅ All items found!'))
+    .catch(()=>chkToast('✅ Saved locally'));
+}
+
+function chkReset(tab){
+  if(!confirm('Reset?'))return;
+  const scr=document.getElementById('chk-scr-'+tab);
+  scr.querySelectorAll('.chip').forEach(c=>c.classList.remove('found','notfound'));
+  scr.querySelectorAll('.ob').forEach(b=>b.classList.remove('sg','sr','sa'));
+  scr.querySelectorAll('input[type=text],input[type=date],input[type=time],textarea').forEach(e=>e.value='');
+  scr.querySelectorAll('select').forEach(e=>e.value='');
+  chkProg(tab);
+}
+
+function renderChkLogs(){
+  const logs=chkGetLogs();
+  const list=document.getElementById('chk-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:14px">No submissions yet</div>';return;}
+  list.innerHTML=logs.map(l=>`<div class="le">
+    <div class="lm">${l.time}</div>
+    <div class="lt">${l.type} · ${l.name||'—'} · ${l.shift||'—'}${l.unit?' · Unit '+l.unit:''}</div>
+    <div>
+      <span class="tag" style="background:#e8f5e9;color:#2e7d32">✅ Submitted</span>
+      ${l.not_found_count>0?`<span class="tag" style="background:#ffebee;color:#c62828">✗ ${l.not_found_count} not found</span>`:'<span class="tag" style="background:#e8f5e9;color:#2e7d32">All found</span>'}
+    </div>
+    ${l.not_found_list?`<div style="font-size:11px;color:#c62828;margin-top:4px">Not found: ${l.not_found_list}</div>`:''}
+  </div>`).join('');
+}
+
+function chkClearLogs(){if(!confirm('Delete all logs?'))return;localStorage.removeItem('ems_v3');renderChkLogs();}
+function chkGetLogs(){try{return JSON.parse(localStorage.getItem('ems_v3')||'[]');}catch(e){return[];}}
+function chkToast(msg){const t=document.getElementById('chk-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2800);}
+</script>
+<!-- ═══════════════ DAILY BAG OVERLAY ═══════════════ -->
+<div id="bag-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f5f4f0;flex-direction:column;overflow-y:auto">
+
+<style>
+.bag-header{background:#D85A30;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:700}
+.bag-close{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:20px;width:34px;height:34px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0}
+.bag-meta-grid{background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:1px;border-bottom:1px solid #ddd}
+.bag-meta-cell{padding:8px 12px;display:flex;flex-direction:column;gap:3px;border-right:1px solid #eee}
+.bag-meta-cell:last-child{border-right:none}
+.bag-meta-label{font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+.bag-meta-cell input,.bag-meta-cell select{font-family:inherit;font-size:14px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+.bag-sec-head{background:#D85A30;color:#fff;text-align:center;padding:7px 10px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.bag-progress-wrap{background:#fff;padding:8px 12px;border-bottom:1px solid #eee;position:sticky;top:58px;z-index:650}
+.bag-progress-track{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+.bag-progress-fill{height:5px;background:#D85A30;border-radius:99px;transition:width .3s}
+.bag-progress-text{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+.bag-med-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee}
+.bag-med-row{background:#fff;padding:8px 8px;display:flex;flex-direction:column;gap:5px}
+.bag-med-name{font-size:11px;font-weight:700;color:#1a1a1a;line-height:1.3;min-height:28px}
+.bag-qty-row{display:flex;flex-wrap:wrap;gap:3px}
+.bag-qty-btn{min-width:28px;height:28px;padding:0 4px;border-radius:5px;border:1.5px solid #ddd;background:#f5f4f0;font-family:inherit;font-size:11px;font-weight:700;color:#444;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.bag-qty-btn:active{transform:scale(0.93)}
+.bag-qty-btn.sel-zero{background:#ffebee;border-color:#c62828;color:#c62828}
+.bag-qty-btn.sel-num{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+.bag-bottom-bar{background:#fff;border-top:1px solid #ddd;padding:12px 14px;display:flex;gap:8px;position:sticky;bottom:0;z-index:650}
+.bag-btn{flex:1;padding:13px;border-radius:9px;border:none;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.bag-btn-save{background:#D85A30;color:#fff}
+.bag-btn-reset{background:#eee;color:#444}
+.bag-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.bag-notes-row{background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee}
+.bag-notes-row label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.bag-notes-row textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:55px;outline:none;color:#1a1a1a;background:#fafafa}
+</style>
+
+<div class="bag-header">
+  <button class="bag-close" onclick="closeBagChecklist()">←</button>
+  <div>
+    <div style="font-size:14px;font-weight:800" id="bag-title">Daily Medication Bag</div>
+    <div style="font-size:11px;opacity:.8" id="bag-subtitle">Bag Check</div>
+  </div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+
+<div class="bag-meta-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+  <div class="bag-meta-cell"><span class="bag-meta-label">Date</span><input type="date" id="bag-date"></div>
+  <div class="bag-meta-cell"><span class="bag-meta-label">Shift</span>
+    <select id="bag-shift"><option value="">Select</option><option>DAY</option><option>NIGHT</option></select>
+  </div>
+  <div class="bag-meta-cell"><span class="bag-meta-label">Name</span><input type="text" id="bag-name" placeholder="Full name"></div>
+  <div class="bag-meta-cell"><span class="bag-meta-label">ID</span><input type="text" id="bag-id" placeholder="ID"></div>
+</div>
+
+<!-- Bag number -->
+<div style="background:#fff;border-bottom:0.5px solid #eee;padding:10px 12px">
+  <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Bag Number</div>
+  <div style="display:flex;gap:8px">
+    <button class="bag-qty-btn" style="flex:1;font-size:15px" onclick="bagSelectBagNum(this,1)">Bag 1</button>
+    <button class="bag-qty-btn" style="flex:1;font-size:15px" onclick="bagSelectBagNum(this,2)">Bag 2</button>
+  </div>
+</div>
+
+<div class="bag-progress-wrap">
+  <div class="bag-progress-track"><div class="bag-progress-fill" id="bag-progress-fill" style="width:0%"></div></div>
+  <div class="bag-progress-text"><span id="bag-progress-text">0 of 0 medications checked</span><span id="bag-progress-pct">0%</span></div>
+</div>
+
+<div class="bag-sec-head">Medications</div>
+<div id="bag-med-list" class="bag-med-grid"></div>
+
+<div class="bag-notes-row">
+  <label>Notes</label>
+  <textarea id="bag-notes" placeholder="Any notes..."></textarea>
+</div>
+
+<div class="bag-bottom-bar">
+  <button class="bag-btn bag-btn-save" onclick="bagSave()">Save</button>
+  <button class="bag-btn" style="background:#1a3a5c;color:#fff" onclick="bagShowLogs()">Logs</button>
+  <button class="bag-btn bag-btn-reset" onclick="bagReset()">Reset</button>
+</div>
+
+<div class="bag-toast" id="bag-toast"></div>
+
+<div id="bag-log-screen" style="display:none;position:absolute;inset:0;background:#f5f4f0;z-index:800;overflow-y:auto;border-radius:var(--border-radius-lg)">
+  <div style="background:#D85A30;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:810">
+    <button onclick="bagHideLogs()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">←</button>
+    <div style="font-size:15px;font-weight:500">Submission logs</div>
+  </div>
+  <div id="bag-log-list" style="padding:10px 12px"></div>
+  <button onclick="bagClearLogs()" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:500;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<script>
+const DAILY_BAG_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzw-cItPyQH5toORw7eiMHe66j6My5XLGCzp2pVSZnaa8D6eB6ilymBkEUnll3z1T5f9Q/exec';
+
+const DAILY_BAG_MEDS = [
+  {name:'Adenosine 3mg / 2ml', max:4},
+  {name:'Aspirin ASA 100mg Tablet', max:10},
+  {name:'Paracetamol 500mg', max:10},
+  {name:'Isosorbide Dinitrate 5mg', max:9},
+  {name:'MDI Albuterol / Ventolin', max:4},
+  {name:'Dermagel Cream 50g', max:4},
+  {name:'Salbutamol 0.5% in 20ml', max:4},
+  {name:'NSS / LRS 500ml', max:4},
+  {name:'DSW Water 500ml', max:4},
+  {name:'NSS for Injection 10ml', max:4},
+  {name:'0.9% NSS 50ml', max:4},
+  {name:'Metoclopramide 10mg / 2ml', max:4},
+  {name:'Naloxone 0.4mg / 1ml', max:7},
+  {name:'Norepinephrine 1mg / 4ml', max:7},
+  {name:'Procainamide 100mg / 10ml', max:4},
+  {name:'Furosemide 10mg / 2ml', max:7},
+  {name:'Glucagon 1mg prefilled syringe', max:7},
+  {name:'Hydrocortisone 100mg', max:7},
+  {name:'Magnesium Sulfate 500(50%) 5ml', max:7},
+  {name:'Dopamine 40mg / 5ml', max:7},
+  {name:'Epinephrine 1:10,000 (0.1mg/ml)', max:7},
+  {name:'Epinephrine 1:1000 (1mg/ml)', max:7},
+  {name:'Flumazenil 0.5mg / 5ml', max:4},
+  {name:'Amiodarone 50mg / 3ml', max:6},
+  {name:'Atropine Sulphate 0.5mg / 5ml', max:7},
+  {name:'Dextrose 50% 50ml', max:4},
+  {name:'Diltiazem 5mg / 5ml', max:7},
+];
+
+let bagSelectedNum = null;
+
+function buildBagMedList(){
+  const list = document.getElementById('bag-med-list');
+  list.innerHTML = DAILY_BAG_MEDS.map((med, idx) => {
+    let btns = '';
+    for(let i = 0; i <= med.max; i++){
+      btns += `<button class="bag-qty-btn" onclick="bagSelectQty(this,${idx},${i})">${i}</button>`;
+    }
+    return `<div class="bag-med-row" id="bag-med-${idx}">
+      <div class="bag-med-name">${med.name}</div>
+      <div class="bag-qty-row">${btns}</div>
+    </div>`;
+  }).join('');
+}
+
+function bagSelectQty(btn, idx, qty){
+  const row = document.getElementById('bag-med-'+idx);
+  row.querySelectorAll('.bag-qty-btn').forEach(b=>{
+    b.classList.remove('sel-zero','sel-num');
+  });
+  btn.classList.add(qty===0 ? 'sel-zero' : 'sel-num');
+  bagUpdateProgress();
+}
+
+function bagSelectBagNum(btn, num){
+  bagSelectedNum = num;
+  btn.closest('div').querySelectorAll('.bag-qty-btn').forEach(b=>{
+    b.classList.remove('sel-num','sel-zero');
+  });
+  btn.classList.add('sel-num');
+}
+
+function bagUpdateProgress(){
+  const total = DAILY_BAG_MEDS.length;
+  let done = 0;
+  DAILY_BAG_MEDS.forEach((_,idx)=>{
+    const row = document.getElementById('bag-med-'+idx);
+    if(row && (row.querySelector('.sel-zero')||row.querySelector('.sel-num'))) done++;
+  });
+  const pct = Math.round(done/total*100);
+  const fill = document.getElementById('bag-progress-fill');
+  fill.style.width = pct+'%';
+  fill.style.background = pct===100 ? '#2e7d32' : '#D85A30';
+  document.getElementById('bag-progress-text').textContent = done+' of '+total+' medications checked';
+  document.getElementById('bag-progress-pct').textContent = pct+'%';
+}
+
+function bagSave(){
+  const name = document.getElementById('bag-name').value.trim();
+  const shift = document.getElementById('bag-shift').value;
+  const date = document.getElementById('bag-date').value;
+  const id = document.getElementById('bag-id').value.trim();
+
+  if(!name){ bagShowToast('\u26a0 Please enter your name'); return; }
+  if(!shift){ bagShowToast('\u26a0 Please select a shift'); return; }
+  if(!bagSelectedNum){ bagShowToast('\u26a0 Please select bag number'); return; }
+
+  // Check all meds selected
+  const unselected = [];
+  DAILY_BAG_MEDS.forEach((med,idx)=>{
+    const row = document.getElementById('bag-med-'+idx);
+    if(!row.querySelector('.sel-zero') && !row.querySelector('.sel-num')){
+      unselected.push(med.name);
+    }
+  });
+  if(unselected.length > 0){
+    bagShowToast('\u26a0 '+unselected.length+' medications not checked yet');
+    return;
+  }
+
+  // Collect quantities
+  const data = {
+    type: 'Daily Bag',
+    bag_number: bagSelectedNum,
+    date, shift, name, id,
+    notes: document.getElementById('bag-notes').value.trim(),
+    status: 'COMPLETE',
+  };
+
+  const zeroMeds = [];
+  DAILY_BAG_MEDS.forEach((med,idx)=>{
+    const row = document.getElementById('bag-med-'+idx);
+    const selBtn = row.querySelector('.sel-zero,.sel-num');
+    const qty = selBtn ? parseInt(selBtn.textContent) : '';
+    const key = med.name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+    data[key] = qty;
+    if(qty === 0) zeroMeds.push(med.name);
+  });
+
+  data.zero_items = zeroMeds.join(', ');
+  data.zero_count = zeroMeds.length;
+
+  // Save locally
+  let logs = [];
+  try{ logs = JSON.parse(localStorage.getItem('daily_bag_logs')||'[]'); }catch(e){}
+  logs.unshift({...data, time: new Date().toLocaleString('en-GB')});
+  if(logs.length>60) logs=logs.slice(0,60);
+  localStorage.setItem('daily_bag_logs', JSON.stringify(logs));
+
+  // Send to Google Sheets
+  if(DAILY_BAG_SHEETS_URL && DAILY_BAG_SHEETS_URL !== 'YOUR_DAILY_BAG_SHEETS_URL_HERE'){
+    fetch(DAILY_BAG_SHEETS_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    }).then(()=>{
+      if(zeroMeds.length > 0){
+        bagShowToast('\u2705 Complete! '+zeroMeds.length+' item(s) at zero — saved to sheet');
+      } else {
+        bagShowToast('\u2705 All medications found — checklist complete!');
+      }
+    }).catch(()=>{
+      bagShowToast('\u2705 Complete — saved locally');
+    });
+  } else {
+    bagShowToast('\u2705 Checklist complete — saved!');
+  }
+}
+
+function bagReset(){
+  if(!confirm('Reset this checklist?')) return;
+  bagSelectedNum = null;
+  document.querySelectorAll('#bag-overlay .bag-qty-btn').forEach(b=>b.classList.remove('sel-zero','sel-num'));
+  document.getElementById('bag-name').value='';
+  document.getElementById('bag-id').value='';
+  document.getElementById('bag-shift').value='';
+  document.getElementById('bag-notes').value='';
+  document.getElementById('bag-date').value=new Date().toISOString().split('T')[0];
+  bagUpdateProgress();
+}
+
+function launchBagChecklist(type){
+  buildBagMedList();
+  document.getElementById('bag-overlay').style.display='flex';
+  document.getElementById('bag-overlay').style.flexDirection='column';
+  document.getElementById('bag-date').value=new Date().toISOString().split('T')[0];
+  bagUpdateProgress();
+  document.getElementById('bag-overlay').scrollTop=0;
+}
+
+function closeBagChecklist(){
+  document.getElementById('bag-overlay').style.display='none';
+}
+
+function bagShowLogs(){
+  const list = document.getElementById('bag-log-list');
+  list.innerHTML='<div style="text-align:center;padding:20px;color:#888;font-size:13px">Loading submissions from all iPads...</div>';
+  document.getElementById('bag-log-screen').style.display='block';
+
+  fetch(DAILY_CSV)
+    .then(r=>r.text())
+    .then(text=>{
+      const rows=parseCSV(text);
+      if(!rows.length){
+        list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:14px">No submissions yet</div>';
+        return;
+      }
+      list.innerHTML=rows.map(r=>{
+        const time = r['Timestamp']||'';
+        const bagNum = r['Bag Number']||r['bag_number']||'';
+        const name = r['Name']||'—';
+        const shift = r['Shift']||'—';
+        const zeroCount = parseInt(r['Zero Count']||r['zero_count']||0);
+        const zeroItems = r['Zero Items']||r['zero_items']||'';
+        const notes = r['Notes']||'';
+        return `<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+          <div style="font-size:10px;color:#888;margin-bottom:3px">${time}</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:5px">Bag ${bagNum} · ${name} · ${shift}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">✅ Submitted</span>
+            ${zeroCount>0?`<span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#ffebee;color:#c62828">${zeroCount} item(s) at zero</span>`:'<span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">All found</span>'}
+          </div>
+          ${zeroItems?`<div style="font-size:11px;color:#c62828;margin-top:5px">Zero: ${zeroItems}</div>`:''}
+          ${notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${notes}</div>`:''}
+        </div>`;
+      }).join('');
+    })
+    .catch(()=>{
+      const logs = bagGetLogs();
+      if(!logs.length){
+        list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:14px">No submissions yet</div>';
+        return;
+      }
+      list.innerHTML='<div style="font-size:11px;color:#888;text-align:center;padding:6px;margin-bottom:6px">Showing local logs only — check connection</div>'+
+      logs.map(l=>`
+        <div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+          <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:5px">Bag ${l.bag_number} · ${l.name} · ${l.shift||'—'}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">✅ Submitted</span>
+            ${l.zero_count>0?`<span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#ffebee;color:#c62828">${l.zero_count} item(s) at zero</span>`:'<span style="font-size:11px;font-weight:500;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">All found</span>'}
+          </div>
+          ${l.zero_items?`<div style="font-size:11px;color:#c62828;margin-top:5px">Zero: ${l.zero_items}</div>`:''}
+          ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
+        </div>`).join('');
+    });
+}
+
+function bagHideLogs(){
+  document.getElementById('bag-log-screen').style.display='none';
+}
+
+function bagClearLogs(){
+  if(!confirm('Delete all logs?')) return;
+  localStorage.removeItem('daily_bag_logs');
+  bagShowLogs();
+}
+
+function bagGetLogs(){
+  try{ return JSON.parse(localStorage.getItem('daily_bag_logs')||'[]'); }catch(e){ return []; }
+}
+
+function bagShowToast(msg){
+  const t=document.getElementById('bag-toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',2800);
+}
+</script>
+
+
+<!-- ═══════════════ BACKUP BAG OVERLAY ═══════════════ -->
+<div id="backup-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f5f4f0;overflow-y:auto">
+<style>
+.bk-hdr{background:#993556;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.bk-hdr button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+.bk-mg{background:#fff;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;border-bottom:1px solid #ddd}
+.bk-mc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+.bk-mc:last-child{border-right:none}
+.bk-ml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+.bk-mc input,.bk-mc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+.bk-bags-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#eee;margin-top:2px}
+.bk-bag-card{background:#fff;padding:12px 12px 14px;display:flex;flex-direction:column;gap:8px}
+.bk-bag-title{font-size:11px;font-weight:800;color:#993556;text-transform:uppercase;letter-spacing:.05em;text-align:center;padding-bottom:7px;border-bottom:1px solid #f4c0d1}
+.bk-seal-label{font-size:10px;font-weight:700;color:#888;text-align:center}
+.bk-seal-inp{font-family:inherit;font-size:18px;font-weight:800;border:none;border-bottom:2.5px solid #993556;outline:none;width:100%;padding:4px 0;color:#993556;background:transparent;text-align:center}
+.bk-seal-inp:focus{border-bottom-color:#72243E}
+.bk-contents-toggle{font-size:10px;font-weight:700;color:#993556;background:none;border:none;cursor:pointer;font-family:inherit;text-align:center;width:100%;padding:4px 0}
+.bk-contents-list{display:none;margin-top:6px}
+.bk-med{font-size:10px;color:#72243E;background:#fdf0f5;border-radius:5px;padding:4px 6px;margin-bottom:3px;font-weight:600}
+.bk-campus{background:#f5f4f0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:100px}
+.bk-campus span{font-size:11px;color:#888;font-weight:600;text-align:center}
+.bk-notes-row{background:#fff;padding:10px 12px;border-top:1px solid #eee}
+.bk-notes-row label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.bk-notes-row textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:50px;outline:none;color:#1a1a1a;background:#fafafa}
+.bk-bottom-bar{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+.bk-btn{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.bk-toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+.bk-log-screen{display:none;position:fixed;inset:0;background:#f5f4f0;z-index:800;overflow-y:auto}
+.bk-log-hdr{background:#993556;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0}
+.bk-log-hdr button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+</style>
+
+<div class="bk-hdr">
+  <button onclick="closeBackupBag()">&#8592;</button>
+  <div style="flex:1">
+    <div style="font-size:15px;font-weight:800">Backup Bags</div>
+    <div style="font-size:10px;opacity:.8">Seal number check — all 3 bags</div>
+  </div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+
+<div class="bk-mg">
+  <div class="bk-mc"><span class="bk-ml">Date</span><input type="date" id="bk-date"></div>
+  <div class="bk-mc"><span class="bk-ml">Shift</span><select id="bk-shift"><option value="">--</option><option>DAY</option><option>NIGHT</option></select></div>
+  <div class="bk-mc"><span class="bk-ml">Name</span><input type="text" id="bk-name" placeholder="Full name"></div>
+  <div class="bk-mc"><span class="bk-ml">ID</span><input type="text" id="bk-id" placeholder="ID"></div>
+</div>
+
+<div style="background:#fff;padding:8px 12px;border-bottom:1px solid #eee;font-size:11px;color:#888;text-align:center">
+  Tap <strong style="color:#993556">Show contents</strong> on any bag to see what should be inside
+</div>
+
+<div class="bk-bags-grid">
+
+  <!-- BAG 1 -->
+  <div class="bk-bag-card">
+    <div class="bk-bag-title">Bag 1</div>
+    <span class="bk-seal-label">Seal number</span>
+    <input class="bk-seal-inp" type="number" id="bk-seal-1" placeholder="000000" inputmode="numeric">
+    <button class="bk-contents-toggle" onclick="bkToggle(1)">+ Show contents</button>
+    <div class="bk-contents-list" id="bk-list-1">
+      <div class="bk-med">Adenosine 3mg/2ml</div>
+      <div class="bk-med">Aspirin ASA 100mg</div>
+      <div class="bk-med">Paracetamol 500mg</div>
+      <div class="bk-med">Isosorbide Dinitrate 5mg</div>
+      <div class="bk-med">MDI Albuterol/Ventolin</div>
+      <div class="bk-med">Dermagel Cream 50g</div>
+      <div class="bk-med">Salbutamol 0.5% 20ml</div>
+      <div class="bk-med">NSS/LRS 500ml</div>
+      <div class="bk-med">DSW Water 500ml</div>
+      <div class="bk-med">NSS Injection 10ml</div>
+      <div class="bk-med">0.9% NSS 50ml</div>
+      <div class="bk-med">Metoclopramide 10mg/2ml</div>
+      <div class="bk-med">Naloxone 0.4mg/1ml</div>
+      <div class="bk-med">Norepinephrine 1mg/4ml</div>
+      <div class="bk-med">Procainamide 100mg/10ml</div>
+      <div class="bk-med">Furosemide 10mg/2ml</div>
+      <div class="bk-med">Glucagon 1mg prefilled</div>
+      <div class="bk-med">Hydrocortisone 100mg</div>
+      <div class="bk-med">Magnesium Sulfate 5ml</div>
+      <div class="bk-med">Dopamine 40mg/5ml</div>
+      <div class="bk-med">Epinephrine 1:10,000</div>
+      <div class="bk-med">Epinephrine 1:1000</div>
+      <div class="bk-med">Flumazenil 0.5mg/5ml</div>
+      <div class="bk-med">Amiodarone 50mg/3ml</div>
+      <div class="bk-med">Atropine 0.5mg/5ml</div>
+      <div class="bk-med">Dextrose 50% 50ml</div>
+      <div class="bk-med">Diltiazem 5mg/5ml</div>
+    </div>
+  </div>
+
+  <!-- BAG 2 -->
+  <div class="bk-bag-card">
+    <div class="bk-bag-title">Bag 2</div>
+    <span class="bk-seal-label">Seal number</span>
+    <input class="bk-seal-inp" type="number" id="bk-seal-2" placeholder="000000" inputmode="numeric">
+    <button class="bk-contents-toggle" onclick="bkToggle(2)">+ Show contents</button>
+    <div class="bk-contents-list" id="bk-list-2">
+      <div class="bk-med">Adenosine 3mg/2ml</div>
+      <div class="bk-med">Aspirin ASA 100mg</div>
+      <div class="bk-med">Paracetamol 500mg</div>
+      <div class="bk-med">Isosorbide Dinitrate 5mg</div>
+      <div class="bk-med">MDI Albuterol/Ventolin</div>
+      <div class="bk-med">Dermagel Cream 50g</div>
+      <div class="bk-med">Salbutamol 0.5% 20ml</div>
+      <div class="bk-med">NSS/LRS 500ml</div>
+      <div class="bk-med">DSW Water 500ml</div>
+      <div class="bk-med">NSS Injection 10ml</div>
+      <div class="bk-med">0.9% NSS 50ml</div>
+      <div class="bk-med">Metoclopramide 10mg/2ml</div>
+      <div class="bk-med">Naloxone 0.4mg/1ml</div>
+      <div class="bk-med">Norepinephrine 1mg/4ml</div>
+      <div class="bk-med">Procainamide 100mg/10ml</div>
+      <div class="bk-med">Furosemide 10mg/2ml</div>
+      <div class="bk-med">Glucagon 1mg prefilled</div>
+      <div class="bk-med">Hydrocortisone 100mg</div>
+      <div class="bk-med">Magnesium Sulfate 5ml</div>
+      <div class="bk-med">Dopamine 40mg/5ml</div>
+      <div class="bk-med">Epinephrine 1:10,000</div>
+      <div class="bk-med">Epinephrine 1:1000</div>
+      <div class="bk-med">Flumazenil 0.5mg/5ml</div>
+      <div class="bk-med">Amiodarone 50mg/3ml</div>
+      <div class="bk-med">Atropine 0.5mg/5ml</div>
+      <div class="bk-med">Dextrose 50% 50ml</div>
+      <div class="bk-med">Diltiazem 5mg/5ml</div>
+    </div>
+  </div>
+
+  <!-- BAG 3 CAMPUS -->
+  <div class="bk-bag-card">
+    <div class="bk-bag-title" style="color:#888;border-bottom-color:#ddd">Bag 3 (Campus)</div>
+    <span class="bk-seal-label">Seal number</span>
+    <input class="bk-seal-inp" type="number" id="bk-seal-3" placeholder="000000" inputmode="numeric" style="border-bottom-color:#888;color:#888">
+    <div style="font-size:10px;color:#aaa;text-align:center;margin-top:4px;font-weight:600">Campus bag</div>
+    <div style="font-size:10px;color:#aaa;text-align:center;font-weight:600">Contents list coming soon</div>
+  </div>
+
+</div>
+
+<div class="bk-notes-row">
+  <label>Notes</label>
+  <textarea id="bk-notes" placeholder="Any notes..."></textarea>
+</div>
+
+<div class="bk-bottom-bar">
+  <button class="bk-btn" style="background:#993556;color:#fff" onclick="bkSave()">Save Log</button>
+  <button class="bk-btn" style="background:#2c3e50;color:#fff" onclick="bkShowLogs()">Logs</button>
+  <button class="bk-btn" style="background:#eee;color:#333" onclick="bkReset()">Reset</button>
+</div>
+
+<div class="bk-toast" id="bk-toast"></div>
+
+<div class="bk-log-screen" id="bk-log-screen">
+  <div class="bk-log-hdr">
+    <button onclick="bkHideLogs()">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Backup Bag Logs</div>
+  </div>
+  <div id="bk-log-list" style="padding:10px 12px"></div>
+  <button onclick="bkClearLogs()" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<script>
+const BACKUP_BAG_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwK8o-z8KfRuqyreooIpt7fPmPO_pOI14JQD6k85p0nwZOnbCfvUJ-IduyglfbcaUjN2w/exec';
+
+function launchBackupBag(){
+  document.getElementById('bk-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('bk-seal-1').value = '';
+  document.getElementById('bk-seal-2').value = '';
+  document.getElementById('bk-seal-3').value = '';
+  document.getElementById('bk-name').value = '';
+  document.getElementById('bk-id').value = '';
+  document.getElementById('bk-shift').value = '';
+  document.getElementById('bk-notes').value = '';
+  document.getElementById('bk-list-1').style.display = 'none';
+  document.getElementById('bk-list-2').style.display = 'none';
+  document.getElementById('backup-overlay').style.display = 'block';
+  document.getElementById('backup-overlay').scrollTop = 0;
+}
+
+function closeBackupBag(){
+  document.getElementById('backup-overlay').style.display = 'none';
+}
+
+function bkToggle(num){
+  const list = document.getElementById('bk-list-'+num);
+  const btn = list.previousElementSibling;
+  if(list.style.display === 'none' || list.style.display === ''){
+    list.style.display = 'block';
+    btn.textContent = '- Hide contents';
+  } else {
+    list.style.display = 'none';
+    btn.textContent = '+ Show contents';
+  }
+}
+
+function bkSave(){
+  const name = document.getElementById('bk-name').value.trim();
+  const shift = document.getElementById('bk-shift').value;
+  const seal1 = document.getElementById('bk-seal-1').value.trim();
+  const seal2 = document.getElementById('bk-seal-2').value.trim();
+
+  if(!name){ bkShowToast('⚠ Enter your name first'); return; }
+  if(!shift){ bkShowToast('⚠ Select a shift'); return; }
+  if(!seal1 && !seal2){ bkShowToast('⚠ Enter at least one seal number'); return; }
+
+  const data = {
+    type: 'Backup Bags',
+    date: document.getElementById('bk-date').value,
+    shift, name,
+    id: document.getElementById('bk-id').value.trim(),
+    seal_bag_1: seal1,
+    seal_bag_2: seal2,
+    seal_bag_3: document.getElementById('bk-seal-3').value.trim(),
+    notes: document.getElementById('bk-notes').value.trim(),
+    status: 'COMPLETE',
+  };
+
+  let logs = bkGetLogs();
+  logs.unshift({...data, time: new Date().toLocaleString('en-GB')});
+  if(logs.length > 60) logs = logs.slice(0,60);
+  localStorage.setItem('backup_bag_logs', JSON.stringify(logs));
+
+  if(BACKUP_BAG_SHEETS_URL && BACKUP_BAG_SHEETS_URL !== 'YOUR_BACKUP_BAG_SHEETS_URL_HERE'){
+    fetch(BACKUP_BAG_SHEETS_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)})
+      .then(()=> bkShowToast('✅ All seal numbers saved!'))
+      .catch(()=> bkShowToast('✅ Saved locally'));
+  } else {
+    bkShowToast('✅ Seal numbers logged!');
+  }
+}
+
+function bkReset(){
+  document.getElementById('bk-seal-1').value = '';
+  document.getElementById('bk-seal-2').value = '';
+  document.getElementById('bk-seal-3').value = '';
+  document.getElementById('bk-name').value = '';
+  document.getElementById('bk-id').value = '';
+  document.getElementById('bk-shift').value = '';
+  document.getElementById('bk-notes').value = '';
+  document.getElementById('bk-date').value = new Date().toISOString().split('T')[0];
+}
+
+function bkShowLogs(){
+  const logs = bkGetLogs();
+  const list = document.getElementById('bk-log-list');
+  if(!logs.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;font-size:14px">No logs yet</div>';
+  } else {
+    list.innerHTML = logs.map(l=>`
+      <div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+        <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px">${l.name||'—'} · ${l.shift||'—'} · ${l.date||''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div style="background:#fdf0f5;border-radius:7px;padding:7px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">BAG 1</div>
+            <div style="font-size:16px;font-weight:800;color:#993556">${l.seal_bag_1||'—'}</div>
+          </div>
+          <div style="background:#fdf0f5;border-radius:7px;padding:7px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">BAG 2</div>
+            <div style="font-size:16px;font-weight:800;color:#993556">${l.seal_bag_2||'—'}</div>
+          </div>
+          <div style="background:#f5f4f0;border-radius:7px;padding:7px;text-align:center">
+            <div style="font-size:9px;font-weight:700;color:#888;margin-bottom:3px">BAG 3</div>
+            <div style="font-size:16px;font-weight:800;color:#888">${l.seal_bag_3||'—'}</div>
+          </div>
+        </div>
+        ${l.notes?`<div style="font-size:11px;color:#555;margin-top:5px">Note: ${l.notes}</div>`:''}
+      </div>`).join('');
+  }
+  document.getElementById('bk-log-screen').style.display = 'block';
+}
+
+function bkHideLogs(){ document.getElementById('bk-log-screen').style.display='none'; }
+function bkClearLogs(){ if(!confirm('Delete all logs?')) return; localStorage.removeItem('backup_bag_logs'); bkShowLogs(); }
+function bkGetLogs(){ try{ return JSON.parse(localStorage.getItem('backup_bag_logs')||'[]'); }catch(e){ return []; } }
+function bkShowToast(msg){ const t=document.getElementById('bk-toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+</script>
+
+
+<!-- ═══════════════ EQUIPMENT ROOM 1 OVERLAY ═══════════════ -->
+<div id="equip1-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
+<style>
+#equip1-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#equip1-overlay .eh{background:#185FA5;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#equip1-overlay .eh button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#equip1-overlay .emg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
+#equip1-overlay .emc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#equip1-overlay .emc:last-child{border-right:none}
+#equip1-overlay .eml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#equip1-overlay .emc input,#equip1-overlay .emc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#equip1-overlay .epw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
+#equip1-overlay .ept{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+#equip1-overlay .epf{height:5px;background:#185FA5;border-radius:99px;transition:width .3s}
+#equip1-overlay .epx{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+#equip1-overlay .esh{background:#185FA5;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+#equip1-overlay .eqb{min-width:30px;height:30px;padding:0 5px;border-radius:6px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;transition:all .12s}
+#equip1-overlay .eqb.ez{background:#ffebee;border-color:#c62828;color:#c62828}
+#equip1-overlay .eqb.en{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#equip1-overlay .eyb{flex:1;padding:8px 4px;border-radius:7px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:11px;font-weight:700;color:#444;cursor:pointer;transition:all .12s;text-align:center}
+#equip1-overlay .eyb.ey{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#equip1-overlay .eyb.eno{background:#ffebee;border-color:#c62828;color:#c62828}
+#equip1-overlay .eyb.efu{background:#fff8e1;border-color:#e65100;color:#e65100}
+#equip1-overlay .eyb.eem{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#equip1-overlay .ebb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+#equip1-overlay .ebb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#equip1-overlay .enr textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:50px;outline:none;color:#1a1a1a;background:#fafafa}
+#equip1-overlay .etoast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+</style>
+
+<div class="eh">
+  <button onclick="document.getElementById('equip1-overlay').style.display='none'">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800">Daily Dirty Room Checklist</div><div style="font-size:10px;opacity:.8">Equipment Room 1 · EMS KAAUH</div></div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+
+<div class="emg" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="emc"><span class="eml">Date</span><input type="date" id="eq-date"></div>
+  <div class="emc"><span class="eml">Shift</span><select id="eq-shift"><option value="">--</option><option>D Day</option><option>N Night</option></select></div>
+  <div class="emc"><span class="eml">Name</span><input type="text" id="eq-name" placeholder="Full name"></div>
+</div>
+<div class="emg" style="grid-template-columns:1fr 1fr">
+  <div class="emc"><span class="eml">ID</span><input type="text" id="eq-id" placeholder="ID"></div>
+  <div class="emc"><span class="eml">TL</span><input type="text" id="eq-tl" placeholder="Team Leader"></div>
+</div>
+
+<div class="epw">
+  <div class="ept"><div class="epf" id="eq-pf" style="width:0%"></div></div>
+  <div class="epx"><span id="eq-pt">0 of 6 checked</span><span id="eq-pp">0%</span></div>
+</div>
+
+<!-- TWO COLUMN LAYOUT -->
+<div style="background:#185FA5;color:#fff;display:grid;grid-template-columns:1fr 1fr;text-align:center;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase">
+  <div style="padding:6px 12px;border-right:1px solid rgba(255,255,255,.2)">Equipment</div>
+  <div style="padding:6px 12px">Linen / Hamper</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee">
+
+  <!-- LEFT: Equipment -->
+  <div style="background:#fff;display:flex;flex-direction:column;gap:1px">
+
+    <div style="padding:9px 10px;border-bottom:0.5px solid #eee">
+      <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:2px">Stryker Hydraulic</div>
+      <div style="font-size:9px;color:#888;margin-bottom:6px">ACU S + DR · Total: 2</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap" id="eq-sh-btns">
+        <button class="eqb" onclick="eqQ(this,'sh')">0</button>
+        <button class="eqb" onclick="eqQ(this,'sh')">1</button>
+        <button class="eqb" onclick="eqQ(this,'sh')">2</button>
+        <button class="eqb" onclick="eqOther('sh')" id="eq-sh-other">Other</button>
+      </div>
+      <input type="number" id="eq-sh-inp" placeholder="qty" inputmode="numeric" style="display:none;margin-top:5px;font-family:inherit;font-size:16px;font-weight:700;border:none;border-bottom:2px solid #185FA5;outline:none;width:70px;padding:2px 0;color:#185FA5;background:transparent;text-align:center" onchange="eqInpChange('sh')">
+    </div>
+
+    <div style="padding:9px 10px;border-bottom:0.5px solid #eee">
+      <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:2px">Stryker Manual</div>
+      <div style="font-size:9px;color:#888;margin-bottom:6px">DR · Total: 3</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap" id="eq-sm-btns">
+        <button class="eqb" onclick="eqQ(this,'sm')">0</button>
+        <button class="eqb" onclick="eqQ(this,'sm')">1</button>
+        <button class="eqb" onclick="eqQ(this,'sm')">2</button>
+        <button class="eqb" onclick="eqQ(this,'sm')">3</button>
+        <button class="eqb" onclick="eqOther('sm')" id="eq-sm-other">Other</button>
+      </div>
+      <input type="number" id="eq-sm-inp" placeholder="qty" inputmode="numeric" style="display:none;margin-top:5px;font-family:inherit;font-size:16px;font-weight:700;border:none;border-bottom:2px solid #185FA5;outline:none;width:70px;padding:2px 0;color:#185FA5;background:transparent;text-align:center" onchange="eqInpChange('sm')">
+    </div>
+
+    <div style="padding:9px 10px">
+      <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:2px">Golf Cart Chargers</div>
+      <div style="font-size:9px;color:#888;margin-bottom:6px">A6, A2, DR · Total: 6</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap" id="eq-gc-btns">
+        <button class="eqb" onclick="eqQ(this,'gc')">0</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">1</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">2</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">3</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">4</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">5</button>
+        <button class="eqb" onclick="eqQ(this,'gc')">6</button>
+        <button class="eqb" onclick="eqOther('gc')" id="eq-gc-other">Other</button>
+      </div>
+      <input type="number" id="eq-gc-inp" placeholder="qty" inputmode="numeric" style="display:none;margin-top:5px;font-family:inherit;font-size:16px;font-weight:700;border:none;border-bottom:2px solid #185FA5;outline:none;width:70px;padding:2px 0;color:#185FA5;background:transparent;text-align:center" onchange="eqInpChange('gc')">
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Linen -->
+  <div style="background:#fff;padding:9px 10px;display:flex;flex-direction:column;gap:10px">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px">Bed Sheets</div>
+      <div style="display:flex;gap:5px">
+        <button class="eyb" onclick="eqYN(this,'sheets','ey')">Yes</button>
+        <button class="eyb" onclick="eqYN(this,'sheets','eno')">No</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px">Hamper Installed</div>
+      <div style="display:flex;gap:5px">
+        <button class="eyb" onclick="eqYN(this,'hamper','ey')">Yes</button>
+        <button class="eyb" onclick="eqYN(this,'hamper','eno')">No</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px">Hamper Status</div>
+      <div style="display:flex;gap:5px">
+        <button class="eyb" onclick="eqYN(this,'hstatus','efu')">Full</button>
+        <button class="eyb" onclick="eqYN(this,'hstatus','eem')">Empty</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- REFERENCE -->
+<div style="background:#fff;border-top:1px solid #eee;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="document.getElementById('eq-ref').style.display=document.getElementById('eq-ref').style.display==='none'?'grid':'none'">
+  <span style="font-size:12px;font-weight:700;color:#185FA5">&#9432; Room contents reference</span>
+  <span style="font-size:11px;color:#888">Show / Hide</span>
+</div>
+<div id="eq-ref" style="display:none;grid-template-columns:1fr 1fr;gap:5px;padding:8px 12px;background:#fff;border-bottom:0.5px solid #eee">
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Backboard</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">4</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Folding Stretcher</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">4</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Stair Chair</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">1</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">ALS Bags</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">6</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Golf Cart Chargers</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">4</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">BP Cuffs</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">Multi</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Intubation Bag</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">4</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Laryngoscope</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">Multi</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Triage Tags</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">Multi</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Manual BP</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">10</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Splint Boards</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">4</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Splint Bags</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">14</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">Vacuum Boards</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">3</small></div>
+  <div style="background:#e3f2fd;border-radius:6px;padding:6px 8px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#0C447C">O2 Regulators</span><small style="font-size:10px;font-weight:800;color:#185FA5;background:#fff;padding:1px 6px;border-radius:99px">3</small></div>
+</div>
+
+<div style="background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee">
+  <label style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Notes</label>
+  <textarea id="eq-notes" placeholder="Any notes..." style="font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:50px;outline:none;color:#1a1a1a;background:#fafafa"></textarea>
+</div>
+
+<div class="ebb">
+  <button style="background:#185FA5;color:#fff" onclick="eqSave()">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="eqShowLogs()">Logs</button>
+  <button style="background:#eee;color:#333" onclick="eqReset()">Reset</button>
+</div>
+
+<div class="etoast" id="eq-toast"></div>
+
+<div id="eq-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
+  <div style="background:#185FA5;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('eq-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Equipment Room 1 Logs</div>
+  </div>
+  <div id="eq-log-list" style="padding:10px 12px"></div>
+  <button onclick="if(confirm('Delete all?')){localStorage.removeItem('equip1_logs');eqShowLogs();}" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<script>
+const EQUIP1_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyTV6n0MGlMpg28zRvXeHjZYaCSZ5ry4H2mOZJzrghHMYxBw8tIzm5gzWS2l1ek_GlcRQ/exec';
+const eqVals = {sh:'', sm:'', gc:'', sheets:'', hamper:'', hstatus:''};
+
+function launchEquipRoom1(){
+  Object.keys(eqVals).forEach(k=>eqVals[k]='');
+  document.querySelectorAll('#equip1-overlay .eqb').forEach(b=>b.classList.remove('ez','en'));
+  document.querySelectorAll('#equip1-overlay .eyb').forEach(b=>b.classList.remove('ey','eno','efu','eem'));
+  document.getElementById('eq-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('eq-shift').value='';
+  document.getElementById('eq-name').value='';
+  document.getElementById('eq-id').value='';
+  document.getElementById('eq-tl').value='';
+  document.getElementById('eq-notes').value='';
+  document.getElementById('eq-ref').style.display='none';
+  document.getElementById('equip1-overlay').style.display='block';
+  document.getElementById('equip1-overlay').scrollTop=0;
+  eqProg();
+}
+
+function eqOther(group){
+  const btns = document.getElementById('eq-'+group+'-btns');
+  const inp = document.getElementById('eq-'+group+'-inp');
+  const other = document.getElementById('eq-'+group+'-other');
+  btns.querySelectorAll('.eqb').forEach(b=>b.classList.remove('ez','en'));
+  other.classList.add('en');
+  inp.style.display='inline-block';
+  inp.focus();
+}
+
+function eqInpChange(group){
+  const inp = document.getElementById('eq-'+group+'-inp');
+  const val = parseInt(inp.value);
+  const other = document.getElementById('eq-'+group+'-other');
+  if(!isNaN(val) && val>=0){
+    other.textContent = val;
+    other.classList.add(val===0?'ez':'en');
+    eqVals[group] = val;
+  }
+  eqProg();
+}
+
+function eqQ(btn, group){
+  const val = parseInt(btn.textContent);
+  btn.closest('div').querySelectorAll('.eqb').forEach(b=>b.classList.remove('ez','en'));
+  btn.classList.add(val===0?'ez':'en');
+  eqVals[group]=val;
+  const other = document.getElementById('eq-'+group+'-other');
+  if(other) other.textContent='Other';
+  const inp = document.getElementById('eq-'+group+'-inp');
+  if(inp) inp.style.display='none';
+  eqProg();
+}
+
+function eqYN(btn, group, cls){
+  btn.closest('div').querySelectorAll('.eyb').forEach(b=>b.classList.remove('ey','eno','efu','eem'));
+  btn.classList.add(cls);
+  eqVals[group]=btn.textContent.trim();
+  eqProg();
+}
+
+function eqProg(){
+  const done = Object.values(eqVals).filter(v=>v!=='').length;
+  const total = 6;
+  const pct = Math.round(done/total*100);
+  const f=document.getElementById('eq-pf');
+  f.style.width=pct+'%';
+  f.style.background=pct===100?'#2e7d32':'#185FA5';
+  document.getElementById('eq-pt').textContent=done+' of '+total+' checked';
+  document.getElementById('eq-pp').textContent=pct+'%';
+}
+
+function eqSave(){
+  const name=document.getElementById('eq-name').value.trim();
+  const shift=document.getElementById('eq-shift').value;
+  if(!name){eqToast('⚠ Enter your name');return;}
+  if(!shift){eqToast('⚠ Select a shift');return;}
+  // Check all items selected
+  const missing=[];
+  if(eqVals.sh==='') missing.push('Stryker Hydraulic');
+  if(eqVals.sm==='') missing.push('Stryker Manual');
+  if(eqVals.gc==='') missing.push('Golf Cart Chargers');
+  if(eqVals.sheets==='') missing.push('Bed Sheets');
+  if(eqVals.hamper==='') missing.push('Hamper Installed');
+  if(eqVals.hstatus==='') missing.push('Hamper Status');
+  if(missing.length>0){
+    eqToast('⚠ Not checked: '+missing.join(', '));
+    return;
+  }
+  const data={
+    type:'Equipment Room 1',
+    date:document.getElementById('eq-date').value,
+    shift,name,
+    id:document.getElementById('eq-id').value.trim(),
+    tl:document.getElementById('eq-tl').value.trim(),
+    stryker_hydraulic:eqVals.sh,
+    stryker_manual:eqVals.sm,
+    golf_chargers:eqVals.gc,
+    bed_sheets:eqVals.sheets,
+    hamper_installed:eqVals.hamper,
+    hamper_status:eqVals.hstatus,
+    notes:document.getElementById('eq-notes').value.trim(),
+    status:'COMPLETE',
+  };
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('equip1_logs')||'[]');}catch(e){}
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>60)logs=logs.slice(0,60);
+  localStorage.setItem('equip1_logs',JSON.stringify(logs));
+  if(EQUIP1_SHEETS_URL!=='YOUR_EQUIP1_SHEETS_URL_HERE'){
+    fetch(EQUIP1_SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(()=>eqToast('✅ Saved to sheet!'))
+      .catch(()=>eqToast('✅ Saved locally'));
+  } else { eqToast('✅ Checklist saved!'); }
+}
+
+function eqReset(){
+  if(!confirm('Reset?'))return;
+  launchEquipRoom1();
+}
+
+function eqShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('equip1_logs')||'[]'));}catch(e){}
+  const list=document.getElementById('eq-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';document.getElementById('eq-log-screen').style.display='block';return;}
+  list.innerHTML=logs.map(l=>`<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+    <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:5px">${l.name||'—'} · ${l.shift||'—'} · ${l.date||''}</div>
+    <div style="font-size:11px;color:#444">Stryker H: <b>${l.stryker_hydraulic}</b> &nbsp; Manual: <b>${l.stryker_manual}</b> &nbsp; Golf: <b>${l.golf_chargers}</b></div>
+    <div style="font-size:11px;color:#444;margin-top:3px">Sheets: <b>${l.bed_sheets||'—'}</b> &nbsp; Hamper: <b>${l.hamper_installed||'—'}</b> &nbsp; Status: <b>${l.hamper_status||'—'}</b></div>
+    ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
+  </div>`).join('');
+  document.getElementById('eq-log-screen').style.display='block';
+}
+
+function eqToast(msg){const t=document.getElementById('eq-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+</script>
+
+
+<!-- ═══════════════ EQUIPMENT ROOM 2 OVERLAY ═══════════════ -->
+<div id="equip2-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
+<style>
+#equip2-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#equip2-overlay .e2h{background:#185FA5;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#equip2-overlay .e2h button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#equip2-overlay .e2mg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
+#equip2-overlay .e2mc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#equip2-overlay .e2mc:last-child{border-right:none}
+#equip2-overlay .e2ml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#equip2-overlay .e2mc input,#equip2-overlay .e2mc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#equip2-overlay .e2pw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
+#equip2-overlay .e2pt{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+#equip2-overlay .e2pf{height:5px;background:#185FA5;border-radius:99px;transition:width .3s}
+#equip2-overlay .e2px{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+#equip2-overlay .e2sh{background:#185FA5;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+#equip2-overlay .e2row{background:#fff;border-bottom:0.5px solid #eee;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+#equip2-overlay .e2name{font-size:12px;font-weight:700;color:#1a1a1a;flex:1;min-width:0}
+#equip2-overlay .e2qty{display:flex;flex-wrap:wrap;gap:3px;flex-shrink:0;justify-content:flex-end}
+#equip2-overlay .e2b{min-width:28px;height:28px;padding:0 4px;border-radius:5px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:11px;font-weight:700;color:#444;cursor:pointer;transition:all .12s}
+#equip2-overlay .e2b.ez{background:#ffebee;border-color:#c62828;color:#c62828}
+#equip2-overlay .e2b.en{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#equip2-overlay .e2bb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+#equip2-overlay .e2bb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#equip2-overlay .e2toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+</style>
+
+<div class="e2h">
+  <button onclick="document.getElementById('equip2-overlay').style.display='none'">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800">Daily Equipment Inventory</div><div style="font-size:10px;opacity:.8">Equipment Room 2 · EMS KAAUH</div></div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+
+<div class="e2mg" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="e2mc"><span class="e2ml">Date</span><input type="date" id="e2-date"></div>
+  <div class="e2mc"><span class="e2ml">Shift</span><select id="e2-shift"><option value="">--</option><option>D Day</option><option>N Night</option></select></div>
+  <div class="e2mc"><span class="e2ml">Name</span><input type="text" id="e2-name" placeholder="Full name"></div>
+</div>
+<div class="e2mg" style="grid-template-columns:1fr 1fr">
+  <div class="e2mc"><span class="e2ml">ID</span><input type="text" id="e2-id" placeholder="ID"></div>
+  <div class="e2mc"><span class="e2ml">TL</span><input type="text" id="e2-tl" placeholder="Team Leader"></div>
+</div>
+
+<div class="e2pw">
+  <div class="e2pt"><div class="e2pf" id="e2-pf" style="width:0%"></div></div>
+  <div class="e2px"><span id="e2-pt">0 of 20 checked</span><span id="e2-pp">0%</span></div>
+</div>
+
+<div class="e2sh">Equipment Inventory</div>
+<div id="e2-list"></div>
+
+<div style="background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee">
+  <label style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Notes</label>
+  <textarea id="e2-notes" placeholder="Any notes..." style="font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:50px;outline:none;color:#1a1a1a;background:#fafafa"></textarea>
+</div>
+
+<div class="e2bb">
+  <button style="background:#185FA5;color:#fff" onclick="e2Save()">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="e2ShowLogs()">Logs</button>
+  <button style="background:#eee;color:#333" onclick="e2Reset()">Reset</button>
+</div>
+<div class="e2toast" id="e2-toast"></div>
+
+<div id="e2-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
+  <div style="background:#185FA5;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('e2-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Equipment Room 2 Logs</div>
+  </div>
+  <div id="e2-log-list" style="padding:10px 12px"></div>
+  <button onclick="if(confirm('Delete all?')){localStorage.removeItem('equip2_logs');e2ShowLogs();}" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<!-- ═══════════════ OXYGEN ROOM OVERLAY ═══════════════ -->
+<div id="o2room-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
+<style>
+#o2room-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#o2room-overlay .o2h{background:#0F6E56;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#o2room-overlay .o2h button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#o2room-overlay .o2mg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
+#o2room-overlay .o2mc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#o2room-overlay .o2mc:last-child{border-right:none}
+#o2room-overlay .o2ml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#o2room-overlay .o2mc input,#o2room-overlay .o2mc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#o2room-overlay .o2sh{color:#fff;text-align:center;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+#o2room-overlay .o2btn{flex:1;padding:10px 6px;border-radius:7px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;transition:all .12s;text-align:center}
+#o2room-overlay .o2btn.full{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#o2room-overlay .o2btn.empty{background:#ffebee;border-color:#c62828;color:#c62828}
+#o2room-overlay .o2bb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+#o2room-overlay .o2bb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#o2room-overlay .o2toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+#o2room-overlay .o2pw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
+#o2room-overlay .o2pt{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+#o2room-overlay .o2pf{height:5px;background:#0F6E56;border-radius:99px;transition:width .3s}
+#o2room-overlay .o2px{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+</style>
+
+<div class="o2h">
+  <button onclick="document.getElementById('o2room-overlay').style.display='none'">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800">EMS O2 Room Checklist</div><div style="font-size:10px;opacity:.8">Oxygen Room · EMS KAAUH</div></div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+
+<div class="o2mg" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="o2mc"><span class="o2ml">Date</span><input type="date" id="o2-date"></div>
+  <div class="o2mc"><span class="o2ml">Shift</span><select id="o2-shift"><option value="">--</option><option>DAY</option><option>NIGHT</option></select></div>
+  <div class="o2mc"><span class="o2ml">Name</span><input type="text" id="o2-name" placeholder="Full name"></div>
+</div>
+<div class="o2mg" style="grid-template-columns:1fr 1fr">
+  <div class="o2mc"><span class="o2ml">ID</span><input type="text" id="o2-id" placeholder="ID"></div>
+  <div class="o2mc"><span class="o2ml">Notes</span><input type="text" id="o2-notes" placeholder="Any notes"></div>
+</div>
+
+<div class="o2pw">
+  <div class="o2pt"><div class="o2pf" id="o2-pf" style="width:0%"></div></div>
+  <div class="o2px"><span id="o2-pt">0 of 4 checked</span><span id="o2-pp">0%</span></div>
+</div>
+
+<!-- O2 CYLINDERS GRID -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee;margin-top:2px">
+
+  <!-- LARGE -->
+  <div style="background:#fff;padding:12px 10px;display:flex;flex-direction:column;gap:8px">
+    <div style="background:#0F6E56;color:#fff;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:.05em">LARGE O&#x2082;</div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px;text-align:center">Full cylinders</div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+        <button onclick="o2Count(this,-1,'lf')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#f5f5f5;font-size:18px;font-weight:700;cursor:pointer;color:#444">-</button>
+        <span id="o2-lf-val" style="font-size:28px;font-weight:800;color:#0F6E56;min-width:40px;text-align:center">0</span>
+        <button onclick="o2Count(this,1,'lf')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #0F6E56;background:#e8f5e9;font-size:18px;font-weight:700;cursor:pointer;color:#0F6E56">+</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px;text-align:center">Empty cylinders</div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+        <button onclick="o2Count(this,-1,'le')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#f5f5f5;font-size:18px;font-weight:700;cursor:pointer;color:#444">-</button>
+        <span id="o2-le-val" style="font-size:28px;font-weight:800;color:#c62828;min-width:40px;text-align:center">0</span>
+        <button onclick="o2Count(this,1,'le')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #c62828;background:#ffebee;font-size:18px;font-weight:700;cursor:pointer;color:#c62828">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMALL -->
+  <div style="background:#fff;padding:12px 10px;display:flex;flex-direction:column;gap:8px">
+    <div style="background:#085041;color:#fff;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:.05em">SMALL O&#x2082;</div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px;text-align:center">Full cylinders</div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+        <button onclick="o2Count(this,-1,'sf')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#f5f5f5;font-size:18px;font-weight:700;cursor:pointer;color:#444">-</button>
+        <span id="o2-sf-val" style="font-size:28px;font-weight:800;color:#0F6E56;min-width:40px;text-align:center">0</span>
+        <button onclick="o2Count(this,1,'sf')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #0F6E56;background:#e8f5e9;font-size:18px;font-weight:700;cursor:pointer;color:#0F6E56">+</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px;text-align:center">Empty cylinders</div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+        <button onclick="o2Count(this,-1,'se')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#f5f5f5;font-size:18px;font-weight:700;cursor:pointer;color:#444">-</button>
+        <span id="o2-se-val" style="font-size:28px;font-weight:800;color:#c62828;min-width:40px;text-align:center">0</span>
+        <button onclick="o2Count(this,1,'se')" style="width:32px;height:32px;border-radius:50%;border:1.5px solid #c62828;background:#ffebee;font-size:18px;font-weight:700;cursor:pointer;color:#c62828">+</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="o2bb">
+  <button style="background:#0F6E56;color:#fff" onclick="o2Save()">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="o2ShowLogs()">Logs</button>
+  <button style="background:#eee;color:#333" onclick="o2Reset()">Reset</button>
+</div>
+<div class="o2toast" id="o2-toast"></div>
+
+<div id="o2-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
+  <div style="background:#0F6E56;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('o2-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Oxygen Room Logs</div>
+  </div>
+  <div id="o2-log-list" style="padding:10px 12px"></div>
+  <button onclick="if(confirm('Delete all?')){localStorage.removeItem('o2room_logs');o2ShowLogs();}" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<script>
+// ═══ EQUIPMENT ROOM 2 ═══
+const EQUIP2_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyTV6n0MGlMpg28zRvXeHjZYaCSZ5ry4H2mOZJzrghHMYxBw8tIzm5gzWS2l1ek_GlcRQ/exec';
+const E2_GROUPS = [
+  {name:'Zoll', color:'#1a3a5c', items:[
+    {key:'zoll_defib',        label:'Defibrillator', max:7},
+    {key:'zoll_charger',      label:'Charger',       max:4},
+    {key:'zoll_batteries',    label:'Batteries',     max:14},
+  ]},
+  {name:'LifePak 15', color:'#8b1a1a', items:[
+    {key:'lifepak_defib',     label:'Defibrillator', max:2},
+    {key:'lifepak_charger',   label:'Charger',       max:1},
+    {key:'lifepak_batteries', label:'Batteries',     max:12},
+  ]},
+  {name:'Stryker', color:'#185FA5', items:[
+    {key:'stryker_charger',   label:'Stretcher Charger',   max:5},
+    {key:'stryker_batteries', label:'Stretcher Batteries', max:9},
+  ]},
+  {name:'Oxygen', color:'#0F6E56', items:[
+    {key:'itv_o2_hose',    label:'ITV 1200 O2 Hose', max:3},
+    {key:'o2_regulator',   label:'O2 Regulator',     max:6},
+  ]},
+  {name:'Devices', color:'#533AB7', items:[
+    {key:'otoscope',       label:'Otoscope',          max:7},
+    {key:'suction_machine',label:'Suction Machine',   max:10},
+    {key:'pulse_oximeter', label:'Pulse Oximeter',    max:9},
+    {key:'glucometer',     label:'Glucometer',        max:4},
+  ]},
+  {name:'Monitors & Ventilation', color:'#854F0B', items:[
+    {key:'thermo_digital', label:'Thermometer Digital',    max:5},
+    {key:'thermo_welch',   label:'Thermometer Welch Allyn',max:1},
+    {key:'vs4_monitor',    label:'VS4 Monitor',            max:3},
+    {key:'mech_ventilator',label:'Mechanical Ventilator',  max:3},
+  ]},
+  {name:'PAPR', color:'#3B6D11', items:[
+    {key:'papr_belt',      label:'PAPR Belt TR301N', max:4},
+    {key:'papr_batteries', label:'PAPR Batteries',   max:4},
+  ]},
+];
+const E2_ITEMS = E2_GROUPS.flatMap(g=>g.items);
+
+function launchEquipRoom2(){
+  const list = document.getElementById('e2-list');
+  let idx = 0;
+  list.innerHTML = E2_GROUPS.map(group=>{
+    const itemsHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee">` +
+      group.items.map(item=>{
+        const i = idx++;
+        return `<div style="background:#fff;padding:8px 9px" id="e2r-${i}">
+          <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:2px">${item.label}</div>
+          <div style="font-size:9px;color:#888;margin-bottom:5px">Total: ${item.max}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px" id="e2q-${i}">
+            ${[...Array(Math.min(item.max,10)+1)].map((_,q)=>`<button class="e2b" onclick="e2Sel(this,'e2r-${i}',${q},'e2q-${i}')">${q}</button>`).join('')}
+            <button class="e2b" id="e2other-${i}" onclick="e2Other(${i})" style="min-width:44px">Other</button>
+          </div>
+          <input type="number" id="e2inp-${i}" placeholder="Enter qty" inputmode="numeric"
+            style="display:none;margin-top:5px;font-family:inherit;font-size:14px;font-weight:700;border:none;border-bottom:2px solid #185FA5;outline:none;width:80px;padding:2px 0;color:#185FA5;background:transparent;text-align:center"
+            onchange="e2InpChange(${i})">
+        </div>`;
+      }).join('') + `</div>`;
+    return `<div style="background:${group.color};color:#fff;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+      <span style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase">${group.name}</span>
+      <button onclick="e2CheckAll(this,'${group.name}')" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;font-family:inherit;font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer">Check all</button>
+    </div>${itemsHTML}`;
+  }).join('');
+  document.getElementById('e2-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('e2-shift').value='';
+  document.getElementById('e2-name').value='';
+  document.getElementById('e2-id').value='';
+  document.getElementById('e2-tl').value='';
+  document.getElementById('e2-notes').value='';
+  document.getElementById('equip2-overlay').style.display='block';
+  document.getElementById('equip2-overlay').scrollTop=0;
+  e2Prog();
+}
+
+function e2CheckAll(btn, groupName){
+  const group = E2_GROUPS.find(g=>g.name===groupName);
+  if(!group) return;
+  let startIdx = 0;
+  for(let g of E2_GROUPS){
+    if(g.name===groupName) break;
+    startIdx += g.items.length;
+  }
+  group.items.forEach((item,i)=>{
+    const absIdx = startIdx+i;
+    const cont = document.getElementById('e2q-'+absIdx);
+    if(!cont) return;
+    const btns = cont.querySelectorAll('.e2b');
+    btns.forEach(b=>b.classList.remove('ez','en'));
+    // Check max standard button (last before Other)
+    if(btns.length>1) btns[btns.length-2]?.classList.add('en');
+    // hide input
+    const inp = document.getElementById('e2inp-'+absIdx);
+    if(inp) inp.style.display='none';
+  });
+  btn.textContent='Uncheck all';
+  e2Prog();
+}
+
+function e2Sel(btn, rowId, qty, qtyContId){
+  const cont = document.getElementById(qtyContId||rowId);
+  cont.querySelectorAll('.e2b').forEach(b=>b.classList.remove('ez','en'));
+  btn.classList.add(qty===0?'ez':'en');
+  // hide any open input
+  const row = document.getElementById(rowId);
+  const inp = row?.querySelector('input[type=number]');
+  if(inp) inp.style.display='none';
+  e2Prog();
+}
+
+function e2Other(idx){
+  const inp = document.getElementById('e2inp-'+idx);
+  const cont = document.getElementById('e2q-'+idx);
+  cont.querySelectorAll('.e2b').forEach(b=>b.classList.remove('ez','en'));
+  document.getElementById('e2other-'+idx).classList.add('en');
+  inp.style.display='inline-block';
+  inp.focus();
+}
+
+function e2InpChange(idx){
+  const inp = document.getElementById('e2inp-'+idx);
+  const val = parseInt(inp.value);
+  if(!isNaN(val) && val>=0){
+    document.getElementById('e2other-'+idx).textContent = val;
+    document.getElementById('e2other-'+idx).classList.add(val===0?'ez':'en');
+  }
+  e2Prog();
+}
+
+function e2Prog(){
+  const done = E2_ITEMS.map((_,i)=>document.getElementById('e2r-'+i)?.querySelector('.ez,.en')?1:0).reduce((a,b)=>a+b,0);
+  const pct = Math.round(done/E2_ITEMS.length*100);
+  const f=document.getElementById('e2-pf');
+  f.style.width=pct+'%';
+  f.style.background=pct===100?'#2e7d32':'#185FA5';
+  document.getElementById('e2-pt').textContent=done+' of '+E2_ITEMS.length+' checked';
+  document.getElementById('e2-pp').textContent=pct+'%';
+}
+
+function e2Save(){
+  const name=document.getElementById('e2-name').value.trim();
+  const shift=document.getElementById('e2-shift').value;
+  if(!name){e2Toast('⚠ Enter your name');return;}
+  if(!shift){e2Toast('⚠ Select a shift');return;}
+  // Check all items selected
+  const missing2=[];
+  E2_ITEMS.forEach((item,i)=>{
+    const cont=document.getElementById('e2q-'+i);
+    if(!cont?.querySelector('.e2b.ez,.e2b.en')) missing2.push(item.label);
+  });
+  if(missing2.length>0){
+    e2Toast('⚠ '+missing2.length+' not checked: '+missing2.slice(0,3).join(', ')+(missing2.length>3?' ...':''));
+    return;
+  }
+  const data={type:'Equipment Room 2',date:document.getElementById('e2-date').value,shift,name,id:document.getElementById('e2-id').value.trim(),tl:document.getElementById('e2-tl').value.trim(),notes:document.getElementById('e2-notes').value.trim(),status:'COMPLETE'};
+  E2_ITEMS.forEach((item,i)=>{
+    const cont=document.getElementById('e2q-'+i);
+    const sel=cont?.querySelector('.e2b.ez,.e2b.en');
+    if(sel){
+      const txt=sel.textContent.trim();
+      if(txt==='Other'||isNaN(parseInt(txt))){
+        // read from input
+        const inp=document.getElementById('e2inp-'+i);
+        data[item.key]=inp?parseInt(inp.value)||'':'';
+      } else {
+        data[item.key]=parseInt(txt);
+      }
+    } else { data[item.key]=''; }
+  });
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('equip2_logs')||'[]');}catch(e){}
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>60)logs=logs.slice(0,60);
+  localStorage.setItem('equip2_logs',JSON.stringify(logs));
+  if(EQUIP2_SHEETS_URL!=='YOUR_EQUIP2_SHEETS_URL_HERE'){
+    fetch(EQUIP2_SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>e2Toast('✅ Saved!')).catch(()=>e2Toast('✅ Saved locally'));
+  } else { e2Toast('✅ Checklist saved!'); }
+}
+
+function e2Reset(){if(!confirm('Reset?'))return;launchEquipRoom2();}
+function e2ShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('equip2_logs')||'[]'));}catch(e){}
+  const list=document.getElementById('e2-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';document.getElementById('e2-log-screen').style.display='block';return;}
+  list.innerHTML=logs.map(l=>`<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+    <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:5px">${l.name||'—'} · ${l.shift||'—'} · ${l.date||''}</div>
+    <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">✅ Submitted</span>
+    ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
+  </div>`).join('');
+  document.getElementById('e2-log-screen').style.display='block';
+}
+function e2Toast(msg){const t=document.getElementById('e2-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+
+// ═══ OXYGEN ROOM ═══
+const O2_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyTV6n0MGlMpg28zRvXeHjZYaCSZ5ry4H2mOZJzrghHMYxBw8tIzm5gzWS2l1ek_GlcRQ/exec';
+const o2vals={lf:0,le:0,sf:0,se:0};
+
+function launchO2Room(){
+  o2vals.lf=0;o2vals.le=0;o2vals.sf=0;o2vals.se=0;
+  ['lf','le','sf','se'].forEach(k=>document.getElementById('o2-'+k+'-val').textContent='0');
+  document.getElementById('o2-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('o2-shift').value='';
+  document.getElementById('o2-name').value='';
+  document.getElementById('o2-id').value='';
+  document.getElementById('o2-notes').value='';
+  document.getElementById('o2room-overlay').style.display='block';
+  document.getElementById('o2room-overlay').scrollTop=0;
+  o2Prog();
+}
+
+function o2Count(btn, dir, key){
+  o2vals[key]=Math.max(0, o2vals[key]+dir);
+  document.getElementById('o2-'+key+'-val').textContent=o2vals[key];
+  o2Prog();
+}
+
+function o2Prog(){
+  const done=['lf','le','sf','se'].filter(k=>o2vals[k]>0||document.getElementById('o2-'+k+'-val').textContent==='0').length;
+  document.getElementById('o2-pt').textContent='All counters set';
+  document.getElementById('o2-pp').textContent='Ready';
+}
+
+function o2Save(){
+  const name=document.getElementById('o2-name').value.trim();
+  const shift=document.getElementById('o2-shift').value;
+  if(!name){o2Toast('⚠ Enter your name');return;}
+  if(!shift){o2Toast('⚠ Select a shift');return;}
+  // Oxygen room — counters always have a value (default 0), so no blocking needed
+  // Just confirm they intentionally want to submit
+  const data={type:'Oxygen Room',date:document.getElementById('o2-date').value,shift,name,id:document.getElementById('o2-id').value.trim(),large_full:o2vals.lf,large_empty:o2vals.le,small_full:o2vals.sf,small_empty:o2vals.se,notes:document.getElementById('o2-notes').value.trim(),status:'COMPLETE'};
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('o2room_logs')||'[]');}catch(e){}
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>60)logs=logs.slice(0,60);
+  localStorage.setItem('o2room_logs',JSON.stringify(logs));
+  if(O2_SHEETS_URL!=='YOUR_O2_SHEETS_URL_HERE'){
+    fetch(O2_SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>o2Toast('✅ Saved!')).catch(()=>o2Toast('✅ Saved locally'));
+  } else { o2Toast('✅ O2 count saved!'); }
+}
+
+function o2Reset(){
+  o2vals.lf=0;o2vals.le=0;o2vals.sf=0;o2vals.se=0;
+  ['lf','le','sf','se'].forEach(k=>document.getElementById('o2-'+k+'-val').textContent='0');
+  document.getElementById('o2-shift').value='';
+  document.getElementById('o2-name').value='';
+  document.getElementById('o2-id').value='';
+  document.getElementById('o2-notes').value='';
+}
+
+function o2ShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('o2room_logs')||'[]'));}catch(e){}
+  const list=document.getElementById('o2-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';document.getElementById('o2-log-screen').style.display='block';return;}
+  list.innerHTML=logs.map(l=>`<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+    <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">${l.name||'—'} · ${l.shift||'—'} · ${l.date||''}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div style="background:#e8f5e9;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:2px">LARGE FULL</div><div style="font-size:22px;font-weight:800;color:#0F6E56">${l.large_full}</div></div>
+      <div style="background:#ffebee;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:2px">LARGE EMPTY</div><div style="font-size:22px;font-weight:800;color:#c62828">${l.large_empty}</div></div>
+      <div style="background:#e8f5e9;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:2px">SMALL FULL</div><div style="font-size:22px;font-weight:800;color:#0F6E56">${l.small_full}</div></div>
+      <div style="background:#ffebee;border-radius:7px;padding:8px;text-align:center"><div style="font-size:9px;font-weight:700;color:#888;margin-bottom:2px">SMALL EMPTY</div><div style="font-size:22px;font-weight:800;color:#c62828">${l.small_empty}</div></div>
+    </div>
+    ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
+  </div>`).join('');
+  document.getElementById('o2-log-screen').style.display='block';
+}
+function o2Toast(msg){const t=document.getElementById('o2-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+</script>
+
+</body>
+</html>
