@@ -271,15 +271,20 @@
 
   <div class="section-label" style="margin-top:2rem">Maintenance / Forms</div>
   <div class="sub-list">
-    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+    <a class="sub-btn" href="#" onclick="launchTripsRecord();return false;">
       <div class="sub-dot" style="background:#e65100"></div>
-      <span class="sub-label">Ambulance Maintenance Form</span>
-      <span class="sub-arrow">↗</span>
+      <span class="sub-label">Ambulance Trips Record</span>
+      <span class="sub-arrow">→</span>
     </a>
-    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
-      <div class="sub-dot" style="background:#e65100"></div>
-      <span class="sub-label">Problem Report Form</span>
-      <span class="sub-arrow">↗</span>
+    <a class="sub-btn" href="#" onclick="launchCarWash();return false;">
+      <div class="sub-dot" style="background:#185FA5"></div>
+      <span class="sub-label">Car Wash Record</span>
+      <span class="sub-arrow">→</span>
+    </a>
+    <a class="sub-btn" href="#" onclick="launchIssueReport();return false;">
+      <div class="sub-dot" style="background:#c62828"></div>
+      <span class="sub-label">Issue Report</span>
+      <span class="sub-arrow">→</span>
     </a>
   </div>
 </div>
@@ -613,8 +618,8 @@
 #chk-overlay .lm{font-size:10px;color:#888;margin-bottom:2px}
 #chk-overlay .lt{font-size:13px;font-weight:700;margin-bottom:5px}
 #chk-overlay .tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;display:inline-block;margin:2px}
-#chk-overlay .ca{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-family:inherit;font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;cursor:pointer;float:right;margin-top:-1px}
-#chk-overlay .ca:active{opacity:.7}
+#chk-overlay .ca{background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.9);font-family:inherit;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;cursor:pointer;float:right;margin-top:-1px;outline:none;-webkit-tap-highlight-color:transparent}
+#chk-overlay .ca:active{background:rgba(255,255,255,.3)}
 </style>
 
 <div class="ch">
@@ -705,7 +710,7 @@
 <div class="sh">Splinting / Boards<button class="ca" onclick="checkAll(this)">Check all</button></div>
 <div class="mr"><button class="chip" onclick="tap(this)">Traction A</button><button class="chip" onclick="tap(this)">Traction P</button><button class="chip" onclick="tap(this)">Vacuum L</button><button class="chip" onclick="tap(this)">Vacuum S</button><button class="chip" onclick="tap(this)">Arm Sling</button><button class="chip" onclick="tap(this)">Folding Stretcher</button><button class="chip" onclick="tap(this)">Stair Chair</button><button class="chip" onclick="tap(this)">Back Board</button><button class="chip" onclick="tap(this)">Back Board P</button><button class="chip" onclick="tap(this)">Spider Straps</button><button class="chip" onclick="tap(this)">SAMS</button><button class="chip" onclick="tap(this)">KED</button><button class="chip" onclick="tap(this)">C-Collar</button><button class="chip" onclick="tap(this)">Head Immobilizer</button><button class="chip" onclick="tap(this)">Scoop</button><button class="chip" onclick="tap(this)">Vacuum Splint Pump</button><button class="chip" onclick="tap(this)">Padded Splint</button></div>
 
-<div class="sh">PPE's</div>
+<div class="sh">PPE's<button class="ca" onclick="checkAll(this)">Check all</button></div>
 <div class="mr"><button class="chip" onclick="tap(this)">Vomit Bag</button><button class="chip" onclick="tap(this)">Goggles</button><button class="chip" onclick="tap(this)">Gloves S</button><button class="chip" onclick="tap(this)">Gloves M</button><button class="chip" onclick="tap(this)">Gloves L</button><button class="chip" onclick="tap(this)">Disp. Mask</button><button class="chip" onclick="tap(this)">Iso. Gown</button><button class="chip" onclick="tap(this)">N95</button></div>
 
 <div class="sh">Vehicle Condition</div>
@@ -834,10 +839,21 @@ function parseCSV(text){
 let chkCurTab='amb';
 
 function checkAll(btn){
-  const section = btn.closest('.sh').nextElementSibling;
-  if(!section) return;
-  const chips = section.querySelectorAll('.chip');
-  const allFound = [...chips].every(c=>c.classList.contains('found'));
+  // Get the section header element
+  const sh = btn.closest('.sh,.sh.red');
+  if(!sh) return;
+  
+  // Collect all chips in subsequent siblings until next section header
+  const chips = [];
+  let el = sh.nextElementSibling;
+  while(el && !el.classList.contains('sh') && !el.classList.contains('bb') && !el.classList.contains('nr')){
+    el.querySelectorAll('.chip').forEach(c=>chips.push(c));
+    el = el.nextElementSibling;
+  }
+  
+  if(!chips.length) return;
+  
+  const allFound = chips.every(c=>c.classList.contains('found'));
   chips.forEach(c=>{
     c.classList.remove('found','notfound');
     if(!allFound) c.classList.add('found');
@@ -2459,6 +2475,240 @@ function o2ShowLogs(){
   document.getElementById('o2-log-screen').style.display='block';
 }
 function o2Toast(msg){const t=document.getElementById('o2-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+</script>
+
+
+<!-- ═══════════════ AMBULANCE FORMS ═══════════════ -->
+<div id="amb-forms-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
+<style>
+#amb-forms-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#amb-forms-overlay .afh{color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;transition:background .2s}
+#amb-forms-overlay .afh button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#amb-forms-overlay .afmg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
+#amb-forms-overlay .afmc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#amb-forms-overlay .afmc:last-child{border-right:none}
+#amb-forms-overlay .afml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#amb-forms-overlay .afmc input,#amb-forms-overlay .afmc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#amb-forms-overlay .afsh{color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+#amb-forms-overlay .afrow{background:#fff;border-bottom:0.5px solid #eee;padding:9px 12px}
+#amb-forms-overlay .afbtn{padding:9px 6px;border-radius:7px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;transition:all .12s;text-align:center}
+#amb-forms-overlay .afbtn.sel{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#amb-forms-overlay .afbtn.sel-r{background:#ffebee;border-color:#c62828;color:#c62828}
+#amb-forms-overlay .afbtn.sel-o{background:#fff8e1;border-color:#e65100;color:#e65100}
+#amb-forms-overlay .aftxt{background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee}
+#amb-forms-overlay .aftxt label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+#amb-forms-overlay .aftxt input,#amb-forms-overlay .aftxt textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:8px 10px;width:100%;outline:none;color:#1a1a1a;background:#fafafa}
+#amb-forms-overlay .aftxt textarea{resize:vertical;min-height:80px}
+#amb-forms-overlay .afbb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+#amb-forms-overlay .afbb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#amb-forms-overlay .aftoast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+</style>
+
+<div class="afh" id="af-header">
+  <button onclick="document.getElementById('amb-forms-overlay').style.display='none'">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800" id="af-title">Form</div><div style="font-size:10px;opacity:.8">EMS KAAUH</div></div>
+  <div style="background:rgba(255,255,255,.2);font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px">KAAUH</div>
+</div>
+<div id="af-content"></div>
+<div class="afbb">
+  <button id="af-save-btn" style="color:#fff" onclick="afSave()">Save</button>
+  <button style="background:#2c3e50;color:#fff" onclick="afShowLogs()">Logs</button>
+  <button style="background:#eee;color:#333" onclick="afReset()">Reset</button>
+</div>
+<div class="aftoast" id="af-toast"></div>
+
+<div id="af-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
+  <div id="af-log-header" style="color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('af-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800" id="af-log-title">Logs</div>
+  </div>
+  <div id="af-log-list" style="padding:10px 12px"></div>
+  <button onclick="if(confirm('Delete all?')){{localStorage.removeItem('amb_forms_logs');afShowLogs();}}" style="margin:0 12px 14px;padding:12px;background:#fff;border-radius:9px;border:1px solid #ffcdd2;font-family:inherit;font-size:13px;font-weight:700;color:#c62828;width:calc(100% - 24px);cursor:pointer">Clear all logs</button>
+</div>
+</div>
+
+<script>
+const AMB_FORMS_URL = 'https://script.google.com/macros/s/AKfycbySELbKANKagsUntfWaQzDJ6lLDysSUVu6Ck6TcLDsJ7AAmqJ_K0vl_Fn6kJkX9EaczXw/exec';
+let afForm='', afUnit='', afType='', afPriority='';
+const afWash={};
+
+function afColor(form){return form==='trips'?'#1a3a5c':form==='wash'?'#185FA5':'#c62828';}
+
+function launchTripsRecord(){
+  afForm='trips'; afUnit=''; afType='';
+  const c=afColor('trips');
+  document.getElementById('af-header').style.background=c;
+  document.getElementById('af-save-btn').style.background=c;
+  document.getElementById('af-title').textContent='Ambulance Trips Record';
+  const today=new Date().toISOString().split('T')[0];
+  const now=new Date().toTimeString().slice(0,5);
+  document.getElementById('af-content').innerHTML=`
+    <div class="afmg" style="grid-template-columns:1fr 1fr">
+      <div class="afmc"><span class="afml">Date</span><input type="date" id="af-date" value="${today}"></div>
+      <div class="afmc"><span class="afml">Shift</span><select id="af-shift"><option value="">--</option><option>D Day</option><option>N Night</option></select></div>
+    </div>
+    <div class="afmg" style="grid-template-columns:1fr 1fr">
+      <div class="afmc"><span class="afml">Name</span><input type="text" id="af-name" placeholder="Driver name"></div>
+      <div class="afmc"><span class="afml">ID</span><input type="text" id="af-id" placeholder="Badge No."></div>
+    </div>
+    <div class="afsh" style="background:#1a3a5c">Unit</div>
+    <div class="afrow"><div style="display:flex;gap:5px;width:100%">
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'6552')">6552</button>
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'4340')">4340</button>
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'4341')">4341</button>
+    </div></div>
+    <div class="afsh" style="background:#1a3a5c">Trip Type</div>
+    <div class="afrow"><div style="display:flex;gap:5px;flex-wrap:wrap;width:100%">
+      <button class="afbtn" onclick="afSelType(this,'Transportation')">Transportation</button>
+      <button class="afbtn" onclick="afSelType(this,'Coverage')">Coverage</button>
+      <button class="afbtn" onclick="afSelType(this,'Fuel Refill')">Fuel Refill</button>
+      <button class="afbtn" onclick="afSelType(this,'Maintenance')">Maintenance</button>
+      <button class="afbtn" onclick="afSelType(this,'Other')">Other</button>
+    </div></div>
+    <div class="afmg" style="grid-template-columns:1fr 1fr">
+      <div class="afmc"><span class="afml">Departure</span><input type="time" id="af-depart" value="${now}"></div>
+      <div class="afmc"><span class="afml">Return</span><input type="time" id="af-return"></div>
+    </div>
+    <div class="afmg" style="grid-template-columns:1fr 1fr" id="af-fuel-row" style="display:none">
+      <div class="afmc"><span class="afml">Used Balance</span><input type="number" id="af-used" placeholder="0.00" inputmode="decimal"></div>
+      <div class="afmc"><span class="afml">Remaining Balance</span><input type="number" id="af-remaining" placeholder="0.00" inputmode="decimal"></div>
+    </div>
+    <div class="aftxt"><label>Notes</label><textarea id="af-notes" placeholder="Any notes..."></textarea></div>`;
+  document.getElementById('amb-forms-overlay').style.display='block';
+  document.getElementById('amb-forms-overlay').scrollTop=0;
+}
+
+function launchCarWash(){
+  afForm='wash';
+  const c=afColor('wash');
+  document.getElementById('af-header').style.background=c;
+  document.getElementById('af-save-btn').style.background=c;
+  document.getElementById('af-title').textContent='Car Wash Record';
+  const today=new Date().toISOString().split('T')[0];
+  afWash['4340']=''; afWash['6552']=''; afWash['4341']='';
+  document.getElementById('af-content').innerHTML=`
+    <div class="afmg" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="afmc"><span class="afml">Date</span><input type="date" id="af-date" value="${today}"></div>
+      <div class="afmc"><span class="afml">Name / TL</span><input type="text" id="af-name" placeholder="Your name"></div>
+      <div class="afmc"><span class="afml">ID</span><input type="text" id="af-id" placeholder="Badge No."></div>
+    </div>
+    <div class="afsh" style="background:#185FA5">Wash Status — All 3 Units</div>
+    ${['4340','6552','4341'].map(u=>`
+    <div style="background:#fff;border-bottom:0.5px solid #eee;padding:10px 12px">
+      <div style="font-size:12px;font-weight:800;color:#1a3a5c;margin-bottom:7px">Unit ${u}</div>
+      <div style="display:flex;gap:6px;margin-bottom:7px">
+        <button class="afbtn" id="af-wash-y-${u}" style="flex:1" onclick="afWashSel(this,'${u}','Washed')">✓ Washed</button>
+        <button class="afbtn" id="af-wash-n-${u}" style="flex:1" onclick="afWashSel(this,'${u}','Not Washed')">✗ Not Washed</button>
+      </div>
+      <input type="text" id="af-wash-note-${u}" placeholder="Note if not washed..." style="font-family:inherit;font-size:12px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;outline:none;color:#1a1a1a;background:#fafafa">
+    </div>`).join('')}
+    <div class="aftxt"><label>Notes</label><textarea id="af-notes" placeholder="Any notes..."></textarea></div>`;
+  document.getElementById('amb-forms-overlay').style.display='block';
+  document.getElementById('amb-forms-overlay').scrollTop=0;
+}
+
+function launchIssueReport(){
+  afForm='issue'; afUnit=''; afPriority='';
+  const c=afColor('issue');
+  document.getElementById('af-header').style.background=c;
+  document.getElementById('af-save-btn').style.background=c;
+  document.getElementById('af-title').textContent='Issue Report';
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('af-content').innerHTML=`
+    <div class="afmg" style="grid-template-columns:1fr 1fr">
+      <div class="afmc"><span class="afml">Date</span><input type="date" id="af-date" value="${today}"></div>
+      <div class="afmc"><span class="afml">Shift</span><select id="af-shift"><option value="">--</option><option>D Day</option><option>N Night</option></select></div>
+    </div>
+    <div class="afmg" style="grid-template-columns:1fr 1fr">
+      <div class="afmc"><span class="afml">Name</span><input type="text" id="af-name" placeholder="Your name"></div>
+      <div class="afmc"><span class="afml">ID</span><input type="text" id="af-id" placeholder="Badge No."></div>
+    </div>
+    <div class="afsh" style="background:#c62828">Unit</div>
+    <div class="afrow"><div style="display:flex;gap:5px;width:100%">
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'6552')">6552</button>
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'4340')">4340</button>
+      <button class="afbtn" style="flex:1" onclick="afSelUnit(this,'4341')">4341</button>
+    </div></div>
+    <div class="afsh" style="background:#c62828">Priority</div>
+    <div class="afrow"><div style="display:flex;gap:5px;width:100%">
+      <button class="afbtn" style="flex:1" onclick="afSelPriority(this,'Low')">Low</button>
+      <button class="afbtn" style="flex:1" onclick="afSelPriority(this,'Medium')">Medium</button>
+      <button class="afbtn" style="flex:1" onclick="afSelPriority(this,'High')">High</button>
+      <button class="afbtn" style="flex:1" onclick="afSelPriority(this,'Critical')">Critical</button>
+    </div></div>
+    <div class="aftxt"><label>Issue Description</label><textarea id="af-issue" placeholder="Describe the issue..." style="min-height:120px"></textarea></div>
+    <div class="aftxt"><label>Notes</label><textarea id="af-notes" placeholder="Additional notes..."></textarea></div>`;
+  document.getElementById('amb-forms-overlay').style.display='block';
+  document.getElementById('amb-forms-overlay').scrollTop=0;
+}
+
+function afSelUnit(btn,u){btn.closest('div').querySelectorAll('.afbtn').forEach(b=>b.classList.remove('sel','sel-r','sel-o'));btn.classList.add('sel');afUnit=u;}
+function afSelType(btn,t){btn.closest('div').querySelectorAll('.afbtn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');afType=t;const fr=document.getElementById('af-fuel-row');if(fr)fr.style.display=t==='Fuel Refill'?'grid':'none';}
+function afWashSel(btn,u,s){btn.closest('div').querySelectorAll('.afbtn').forEach(b=>b.classList.remove('sel','sel-r'));btn.classList.add(s==='Washed'?'sel':'sel-r');afWash[u]=s;}
+function afSelPriority(btn,p){btn.closest('div').querySelectorAll('.afbtn').forEach(b=>b.classList.remove('sel','sel-r','sel-o'));btn.classList.add(p==='Critical'?'sel-r':p==='High'?'sel-o':'sel');afPriority=p;}
+
+function afSave(){
+  const name=document.getElementById('af-name')?.value.trim();
+  const date=document.getElementById('af-date')?.value;
+  if(!name){afToast('⚠ Enter your name');return;}
+  let data={date,name,id:document.getElementById('af-id')?.value.trim()||'',notes:document.getElementById('af-notes')?.value.trim()||''};
+
+  if(afForm==='trips'){
+    if(!document.getElementById('af-shift')?.value){afToast('⚠ Select shift');return;}
+    if(!afUnit){afToast('⚠ Select unit');return;}
+    if(!afType){afToast('⚠ Select trip type');return;}
+    data={...data,type:'Ambulance Trip',shift:document.getElementById('af-shift').value,unit:afUnit,trip_type:afType,
+      departure:document.getElementById('af-depart')?.value||'',return_time:document.getElementById('af-return')?.value||'',
+      used_balance:document.getElementById('af-used')?.value||'',remaining_balance:document.getElementById('af-remaining')?.value||'',status:'COMPLETE'};
+  } else if(afForm==='wash'){
+    data={...data,type:'Car Wash',
+      unit_4340:afWash['4340']||'',note_4340:document.getElementById('af-wash-note-4340')?.value||'',
+      unit_6552:afWash['6552']||'',note_6552:document.getElementById('af-wash-note-6552')?.value||'',
+      unit_4341:afWash['4341']||'',note_4341:document.getElementById('af-wash-note-4341')?.value||'',status:'COMPLETE'};
+  } else if(afForm==='issue'){
+    if(!document.getElementById('af-shift')?.value){afToast('⚠ Select shift');return;}
+    if(!afUnit){afToast('⚠ Select unit');return;}
+    if(!afPriority){afToast('⚠ Select priority');return;}
+    const issue=document.getElementById('af-issue')?.value.trim();
+    if(!issue){afToast('⚠ Describe the issue');return;}
+    data={...data,type:'Issue Report',shift:document.getElementById('af-shift').value,unit:afUnit,priority:afPriority,issue_description:issue,status:'Reported'};
+  }
+
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('amb_forms_logs')||'[]');}catch(e){}
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>60)logs=logs.slice(0,60);
+  localStorage.setItem('amb_forms_logs',JSON.stringify(logs));
+
+  if(AMB_FORMS_URL!=='YOUR_AMB_FORMS_URL_HERE'){
+    fetch(AMB_FORMS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(()=>afToast('✅ Saved to sheet!')).catch(()=>afToast('✅ Saved locally'));
+  } else { afToast('✅ Saved!'); }
+}
+
+function afReset(){if(afForm==='trips')launchTripsRecord();else if(afForm==='wash')launchCarWash();else launchIssueReport();}
+
+function afShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('amb_forms_logs')||'[]'));}catch(e){}
+  const filtered=logs.filter(l=>afForm==='trips'?l.type==='Ambulance Trip':afForm==='wash'?l.type==='Car Wash':l.type==='Issue Report');
+  const hdrColor=afColor(afForm);
+  document.getElementById('af-log-header').style.background=hdrColor;
+  document.getElementById('af-log-title').textContent=afForm==='trips'?'Trips Logs':afForm==='wash'?'Car Wash Logs':'Issue Report Logs';
+  const list=document.getElementById('af-log-list');
+  if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';}
+  else{list.innerHTML=filtered.map(l=>`<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+    <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time}</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:5px">${l.name||'—'}${l.unit?' · Unit '+l.unit:''}${l.shift?' · '+l.shift:''}</div>
+    ${l.trip_type?`<div style="font-size:12px;color:#444;margin-bottom:3px">Trip: <b>${l.trip_type}</b></div>`:''}
+    ${l.priority?`<div style="font-size:12px;margin-bottom:3px">Priority: <b style="color:${l.priority==='Critical'?'#c62828':l.priority==='High'?'#e65100':'#2e7d32'}">${l.priority}</b></div>`:''}
+    ${l.issue_description?`<div style="font-size:12px;color:#444;margin-bottom:3px">${l.issue_description}</div>`:''}
+    ${l.unit_4340?`<div style="font-size:11px;color:#444;margin-bottom:3px">4340: <b>${l.unit_4340}</b> &nbsp; 6552: <b>${l.unit_6552||'—'}</b> &nbsp; 4341: <b>${l.unit_4341||'—'}</b></div>`:''}
+    <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">✅ ${l.status||'Submitted'}</span>
+    ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
+  </div>`).join('');}
+  document.getElementById('af-log-screen').style.display='block';
+}
+
+function afToast(msg){const t=document.getElementById('af-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
 </script>
 
 </body>
