@@ -16,18 +16,18 @@
     --text-primary: #1a1a18;
     --text-secondary: #6b6b66;
     --text-muted: #aaaaa3;
-    --accent-cars: #1D9E75;
-    --accent-cars-bg: #E1F5EE;
+    --accent-cars: #1a3a5c;
+    --accent-cars-bg: #E8EEF5;
     --accent-med: #D85A30;
     --accent-med-bg: #FAECE7;
-    --accent-equip: #378ADD;
-    --accent-equip-bg: #E6F1FB;
+    --accent-equip: #0F6E56;
+    --accent-equip-bg: #E1F5EE;
     --accent-daily: #BA7517;
     --accent-daily-bg: #FAEEDA;
-    --accent-incident: #A32D2D;
-    --accent-incident-bg: #FCEBEB;
+    --accent-incident: #BA7517;
+    --accent-incident-bg: #FDF5E6;
     --accent-supply: #533AB7;
-    --accent-supply-bg: #EEEDFE;
+    --accent-supply-bg: #FDF5E6;
     --accent-coverage: #3B6D11;
     --accent-coverage-bg: #EAF3DE;
     --radius: 16px;
@@ -73,26 +73,34 @@
   /* ── MAIN CATEGORY CARD ── */
   .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .cat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.1rem 1rem;
+    background: #fff;
+    border: 0.5px solid #e8eaef;
+    border-left: 3px solid #e8eaef;
+    border-radius: 10px;
+    padding: 10px 8px;
     cursor: pointer;
-    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
-    display: flex; flex-direction: column; gap: 12px;
+    transition: background 0.12s;
+    display: flex; flex-direction: column; gap: 4px;
     animation: fadeUp 0.4s ease both;
-    min-height: 130px;
+    min-height: 0;
   }
-  .cat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-  .cat-card:active { transform: scale(0.97); }
+  .cat-card:active { background: #f5f5f5; }
+  .cat-card[onclick*="page-cars"] { border-left-color:#1a3a5c; }
+  .cat-card[onclick*="page-bags"] { border-left-color:#C0392B; }
+  .cat-card[onclick*="page-campus"] { border-left-color:#E91E8C; }
+  .cat-card[onclick*="page-equip"] { border-left-color:#185FA5; }
+  .cat-card[onclick*="launchDailyReport"] { border-left-color:#BA7517; }
+  .cat-card[onclick*="page-incident"] { border-left-color:#BA7517; }
+  .cat-card[onclick*="page-supply"] { border-left-color:#BA7517; }
+  .cat-card[onclick*="page-coverage"] { border-left-color:#BA7517; }
 
   .cat-icon {
-    width: 38px; height: 38px; border-radius: var(--radius-sm);
+    width: 30px; height: 30px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
+    font-size: 14px; flex-shrink: 0;
   }
-  .cat-name { font-weight: 500; font-size: 14px; color: var(--text-primary); line-height: 1.3; }
-  .cat-count { font-size: 12px; color: var(--text-muted); margin-top: auto; }
+  .cat-name { font-weight: 700; font-size: 11px; color: var(--text-primary); line-height: 1.3; }
+  .cat-count { font-size: 9px; color: var(--text-muted); }
 
   /* ── SUB BUTTON ── */
   .sub-list { display: flex; flex-direction: column; gap: 8px; }
@@ -109,6 +117,14 @@
   }
   .sub-btn:hover { border-color: var(--border-hover); background: #fafaf8; transform: translateX(3px); }
   .sub-btn:active { transform: scale(0.98); }
+  #page-cars .sub-btn { background:#EEF2F8; border-color:#C5D0E0; }
+  #page-bags .sub-btn { background:#FDF0EF; border-color:#F5C6C2; }
+  #page-equip .sub-btn { background:#EEF4FB; border-color:#BDD4EE; }
+  #page-campus .sub-btn { background:#FDF0F7; border-color:#F5B8E0; }
+  #page-daily .sub-btn { background:#FDF6EC; border-color:#EDD9A3; }
+  #page-coverage .sub-btn { background:#FDF6EC; border-color:#EDD9A3; }
+  #page-incident .sub-btn { background:#FDF6EC; border-color:#EDD9A3; }
+  #page-supply .sub-btn { background:#FDF6EC; border-color:#EDD9A3; }
 
   .sub-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .sub-label { font-size: 15px; font-weight: 500; flex: 1; }
@@ -177,19 +193,15 @@
   <div class="cat-grid" style="gap:8px">
 
     <div class="cat-card" onclick="goTo('page-cars')">
-      <div class="cat-icon" style="background:var(--accent-cars-bg)">🚑</div>
-      <div>
-        <div class="cat-name">Ambulance</div>
-        <div class="cat-count">3 vehicles</div>
-      </div>
+      <div class="cat-icon" style="background:#EEF2F8">🚑</div>
+      <div class="cat-name">Ambulance</div>
+      <div class="cat-count">3 vehicles</div>
     </div>
 
     <div class="cat-card" onclick="goTo('page-bags')">
-      <div class="cat-icon" style="background:var(--accent-med-bg)">🎒</div>
-      <div>
-        <div class="cat-name">Bag Check</div>
-        <div class="cat-count">5 bag types</div>
-      </div>
+      <div class="cat-icon" style="background:#FDF0EF">🎒</div>
+      <div class="cat-name">Bag Check</div>
+      <div class="cat-count">5 bag types</div>
     </div>
 
     <div class="cat-card" onclick="goTo('page-campus')">
@@ -201,43 +213,33 @@
     </div>
 
     <div class="cat-card" onclick="goTo('page-equip')">
-      <div class="cat-icon" style="background:var(--accent-equip-bg)">🩺</div>
-      <div>
-        <div class="cat-name">Equipment</div>
-        <div class="cat-count">3 rooms</div>
-      </div>
+      <div class="cat-icon" style="background:#EEF4FB">🩺</div>
+      <div class="cat-name">Equipment</div>
+      <div class="cat-count">3 rooms</div>
     </div>
 
-    <div class="cat-card" onclick="goTo('page-daily')">
-      <div class="cat-icon" style="background:var(--accent-daily-bg)">📋</div>
-      <div>
-        <div class="cat-name">Daily Report</div>
-        <div class="cat-count">Coming soon</div>
-      </div>
+    <div class="cat-card" onclick="launchDailyReport()">
+      <div class="cat-icon" style="background:#FDF6EC">📋</div>
+      <div class="cat-name">Daily Report</div>
+      <div class="cat-count">Shift report</div>
     </div>
 
     <div class="cat-card" onclick="goTo('page-incident')">
-      <div class="cat-icon" style="background:var(--accent-incident-bg)">⚠️</div>
-      <div>
-        <div class="cat-name">Incident Report</div>
-        <div class="cat-count">2 types</div>
-      </div>
+      <div class="cat-icon" style="background:#FDF6EC">⚠️</div>
+      <div class="cat-name">Incident Report</div>
+      <div class="cat-count">2 types</div>
     </div>
 
     <div class="cat-card" onclick="goTo('page-supply')">
-      <div class="cat-icon" style="background:var(--accent-supply-bg)">📦</div>
-      <div>
-        <div class="cat-name">Supply Request</div>
-        <div class="cat-count">Subcategories</div>
-      </div>
+      <div class="cat-icon" style="background:#FDF6EC">📦</div>
+      <div class="cat-name">Supply Request</div>
+      <div class="cat-count">Subcategories</div>
     </div>
 
     <div class="cat-card" onclick="goTo('page-coverage')">
-      <div class="cat-icon" style="background:var(--accent-coverage-bg)">📝</div>
-      <div>
-        <div class="cat-name">Coverage / Event</div>
-        <div class="cat-count">Checklist</div>
-      </div>
+      <div class="cat-icon" style="background:#FDF6EC">📝</div>
+      <div class="cat-name">Coverage / Event</div>
+      <div class="cat-count">Checklist</div>
     </div>
 
   </div>
@@ -256,7 +258,7 @@
      PAGE 2a — AMBULANCE
 ════════════════════════════════════ -->
 <div class="page" id="page-cars">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#1a3a5c,#2c5282);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -315,7 +317,7 @@
      PAGE — CAMPUS
 ════════════════════════════════════ -->
 <div class="page" id="page-campus">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#9C1B6E,#E91E8C);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -350,7 +352,7 @@
      PAGE 2b — BAG CHECK
 ════════════════════════════════════ -->
 <div class="page" id="page-bags">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#C0392B,#E74C3C);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -392,7 +394,7 @@
      PAGE 2c — EQUIPMENT
 ════════════════════════════════════ -->
 <div class="page" id="page-equip">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#185FA5,#2980B9);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -432,7 +434,7 @@
      PAGE 2d — DAILY REPORT
 ════════════════════════════════════ -->
 <div class="page" id="page-daily">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#8B5E0A,#BA7517);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -446,10 +448,10 @@
     </div>
   </div>
   <div class="sub-list">
-    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+    <a class="sub-btn" href="#" onclick="launchDailyReport();return false;">
       <div class="sub-dot" style="background:var(--accent-daily)"></div>
-      <span class="sub-label">Daily Report Form</span>
-      <span class="sub-arrow">↗</span>
+      <span class="sub-label">Daily Shift Report</span>
+      <span class="sub-arrow">→</span>
     </a>
   </div>
 </div>
@@ -459,7 +461,7 @@
      PAGE 2e — INCIDENT REPORT
 ════════════════════════════════════ -->
 <div class="page" id="page-incident">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#8B5E0A,#BA7517);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -494,7 +496,7 @@
      PAGE 2f — SUPPLY REQUEST
 ════════════════════════════════════ -->
 <div class="page" id="page-supply">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#8B5E0A,#BA7517);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -533,7 +535,7 @@
      PAGE 2g — COVERAGE / EVENT
 ════════════════════════════════════ -->
 <div class="page" id="page-coverage">
-  <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:16px 14px 20px">
+  <div style="background:linear-gradient(135deg,#8B5E0A,#BA7517);padding:16px 14px 20px">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="goBack()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0">&#8592;</button>
       <div style="flex:1">
@@ -547,17 +549,17 @@
     </div>
   </div>
 
-  <div class="badge" style="background:var(--accent-coverage-bg);color:var(--accent-coverage)">📝 Checklists</div>
+  <div class="badge" style="background:var(--accent-coverage-bg);color:var(--accent-coverage)">📝 Coverage &amp; Event</div>
   <div class="sub-list">
-    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
-      <div class="sub-dot" style="background:var(--accent-coverage)"></div>
-      <span class="sub-label">Coverage / Event Form</span>
-      <span class="sub-arrow">↗</span>
+    <a class="sub-btn" href="#" onclick="launchNoraBagStock();return false;">
+      <div class="sub-dot" style="background:#BA7517"></div>
+      <span class="sub-label">Coverage Bag Stock (Nora)</span>
+      <span class="sub-arrow">&#8594;</span>
     </a>
-    <a class="sub-btn" href="https://forms.gle/zFKD83upU6d7em9z7" target="_blank">
-      <div class="sub-dot" style="background:var(--accent-coverage)"></div>
-      <span class="sub-label">Coverage Bag</span>
-      <span class="sub-arrow">↗</span>
+    <a class="sub-btn" href="#" onclick="goTo('page-soon');return false;">
+      <div class="sub-dot" style="background:#BA7517"></div>
+      <span class="sub-label">Event Checkout / Return</span>
+      <span class="sub-arrow">&#8594;</span>
     </a>
   </div>
 </div>
@@ -1146,17 +1148,17 @@ function chkToast(msg){const t=document.getElementById('chk-toast');t.textConten
 <div id="bag-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f5f4f0;flex-direction:column;overflow-y:auto">
 
 <style>
-.bag-header{background:#D85A30;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:700}
+.bag-header{background:#0F6E56;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:700}
 .bag-close{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:20px;width:34px;height:34px;border-radius:8px;cursor:pointer;font-weight:700;flex-shrink:0}
 .bag-meta-grid{background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:1px;border-bottom:1px solid #ddd}
 .bag-meta-cell{padding:8px 12px;display:flex;flex-direction:column;gap:3px;border-right:1px solid #eee}
 .bag-meta-cell:last-child{border-right:none}
 .bag-meta-label{font-size:10px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
 .bag-meta-cell input,.bag-meta-cell select{font-family:inherit;font-size:14px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
-.bag-sec-head{background:#D85A30;color:#fff;text-align:center;padding:7px 10px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.bag-sec-head{background:#0F6E56;color:#fff;text-align:center;padding:7px 10px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
 .bag-progress-wrap{background:#fff;padding:8px 12px;border-bottom:1px solid #eee;position:sticky;top:58px;z-index:650}
 .bag-progress-track{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
-.bag-progress-fill{height:5px;background:#D85A30;border-radius:99px;transition:width .3s}
+.bag-progress-fill{height:5px;background:#0F6E56;border-radius:99px;transition:width .3s}
 .bag-progress-text{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
 .bag-med-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee}
 .bag-med-row{background:#fff;padding:8px 8px;display:flex;flex-direction:column;gap:5px}
@@ -1168,7 +1170,7 @@ function chkToast(msg){const t=document.getElementById('chk-toast');t.textConten
 .bag-qty-btn.sel-num{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
 .bag-bottom-bar{background:#fff;border-top:1px solid #ddd;padding:12px 14px;display:flex;gap:8px;position:sticky;bottom:0;z-index:650}
 .bag-btn{flex:1;padding:13px;border-radius:9px;border:none;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
-.bag-btn-save{background:#D85A30;color:#fff}
+.bag-btn-save{background:#0F6E56;color:#fff}
 .bag-btn-reset{background:#eee;color:#444}
 .bag-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 .bag-notes-row{background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee}
@@ -1228,7 +1230,7 @@ function chkToast(msg){const t=document.getElementById('chk-toast');t.textConten
 <div class="bag-toast" id="bag-toast"></div>
 
 <div id="bag-log-screen" style="display:none;position:absolute;inset:0;background:#f5f4f0;z-index:800;overflow-y:auto;border-radius:var(--border-radius-lg)">
-  <div style="background:#D85A30;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:810">
+  <div style="background:#0F6E56;color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:810">
     <button onclick="bagHideLogs()" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">←</button>
     <div style="font-size:15px;font-weight:500">Submission logs</div>
   </div>
@@ -2243,7 +2245,7 @@ function eqToast(msg){const t=document.getElementById('eq-toast');t.textContent=
 
   <!-- SMALL -->
   <div style="background:#fff;padding:12px 10px;display:flex;flex-direction:column;gap:8px">
-    <div style="background:#085041;color:#fff;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:.05em">SMALL O&#x2082;</div>
+    <div style="background:#0F6E56;color:#fff;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:.05em">SMALL O&#x2082;</div>
     <div>
       <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px;text-align:center">Full cylinders</div>
       <div style="display:flex;align-items:center;gap:8px;justify-content:center">
@@ -2578,7 +2580,7 @@ function o2Toast(msg){const t=document.getElementById('o2-toast');t.textContent=
 </style>
 
 <div class="afh" id="af-header">
-  <button onclick="document.getElementById('amb-forms-overlay').style.display='none'">&#8592;</button>
+  <button onclick="closeAmbForms();">&#8592;</button>
   <div style="flex:1"><div style="font-size:14px;font-weight:800" id="af-title">Form</div><div style="font-size:10px;opacity:.8">EMS KAAUH</div></div>
   <div style="display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.2);padding:3px 9px;border-radius:6px">
       <span style="font-size:11px;font-weight:800;color:#fff">KAAUH</span>
@@ -2605,10 +2607,14 @@ function o2Toast(msg){const t=document.getElementById('o2-toast');t.textContent=
 
 <script>
 const AMB_FORMS_URL = 'https://script.google.com/macros/s/AKfycbySELbKANKagsUntfWaQzDJ6lLDysSUVu6Ck6TcLDsJ7AAmqJ_K0vl_Fn6kJkX9EaczXw/exec';
+
+function closeAmbForms(){
+  document.getElementById('amb-forms-overlay').style.display='none';
+}
 let afForm='', afUnit='', afType='', afPriority='';
 const afWash={};
 
-function afColor(form){return form==='trips'?'#1a3a5c':form==='wash'?'#185FA5':'#c62828';}
+function afColor(form){return '#1a3a5c';}
 
 function launchTripsRecord(){
   afForm='trips'; afUnit=''; afType='';
@@ -2767,7 +2773,7 @@ function afShowLogs(){
   const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('amb_forms_logs')||'[]'));}catch(e){}
   const filtered=logs.filter(l=>afForm==='trips'?l.type==='Ambulance Trip':afForm==='wash'?l.type==='Car Wash':l.type==='Issue Report');
   const hdrColor=afColor(afForm);
-  document.getElementById('af-log-header').style.background=hdrColor;
+  document.getElementById('af-log-header').style.background='#1a3a5c';
   document.getElementById('af-log-title').textContent=afForm==='trips'?'Trips Logs':afForm==='wash'?'Car Wash Logs':'Issue Report Logs';
   const list=document.getElementById('af-log-list');
   if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';}
@@ -2792,7 +2798,7 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div id="bls-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
 <style>
 #bls-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-#bls-overlay .bh{background:#1D9E75;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#bls-overlay .bh{background:#E91E8C;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
 #bls-overlay .bh button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
 #bls-overlay .bmg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
 #bls-overlay .bmc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
@@ -2801,10 +2807,10 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 #bls-overlay .bmc input,#bls-overlay .bmc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
 #bls-overlay .bpw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
 #bls-overlay .bpt{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
-#bls-overlay .bpf{height:5px;background:#1D9E75;border-radius:99px;transition:width .3s}
+#bls-overlay .bpf{height:5px;background:#E91E8C;border-radius:99px;transition:width .3s}
 #bls-overlay .bpx{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
-#bls-overlay .bsh{background:#1D9E75;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
-#bls-overlay .bsh.dark{background:#085041}
+#bls-overlay .bsh{background:#E91E8C;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+#bls-overlay .bsh.dark{background:#9C1B6E}
 #bls-overlay .bca{background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.9);font-family:inherit;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;cursor:pointer;float:right;margin-top:-1px;outline:none}
 #bls-overlay .brow{background:#fff;border-bottom:0.5px solid #eee;padding:8px 10px;display:flex;flex-wrap:wrap;gap:5px}
 #bls-overlay .chip{display:inline-flex;align-items:center;padding:8px 12px;border-radius:7px;border:1.5px solid #ccc;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#555;cursor:pointer;transition:all .12s;user-select:none}
@@ -2813,7 +2819,7 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 #bls-overlay .ob{padding:9px 8px;border-radius:7px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;text-align:center;transition:all .12s}
 #bls-overlay .ob.sg{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
 #bls-overlay .ob.sr{background:#ffebee;border-color:#c62828;color:#c62828}
-#bls-overlay .ob.st{background:#085041;border-color:#085041;color:#fff}
+#bls-overlay .ob.st{background:#9C1B6E;border-color:#085041;color:#fff}
 #bls-overlay .bnr{background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee}
 #bls-overlay .bnr label{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
 #bls-overlay .bnr textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:60px;outline:none;color:#1a1a1a;background:#fafafa}
@@ -2823,7 +2829,7 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 </style>
 
 <div class="bh">
-  <button onclick="document.getElementById('bls-overlay').style.display='none'">&#8592;</button>
+  <button onclick="document.getElementById('bls-overlay').style.display='none';">&#8592;</button>
   <div style="flex:1"><div style="font-size:14px;font-weight:800">BLS Bag + Golf Cart Check</div><div style="font-size:10px;opacity:.8">EMS KAAUH Campus</div></div>
   <div style="display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.2);padding:3px 9px;border-radius:6px">
       <span style="font-size:11px;font-weight:800;color:#fff">KAAUH</span>
@@ -2844,14 +2850,34 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div class="bpw"><div class="bpt"><div class="bpf" id="bls-pf" style="width:0%"></div></div>
 <div class="bpx"><span id="bls-pt">0 of 0 checked</span><span id="bls-pp">0%</span></div></div>
 
-<div class="bsh">PPE's<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
-<div class="brow"><button class="chip" onclick="blsTap(this)">Isolation Gown</button><button class="chip" onclick="blsTap(this)">Disposable Gloves</button><button class="chip" onclick="blsTap(this)">Sterile Gloves</button><button class="chip" onclick="blsTap(this)">Disposable Mask</button><button class="chip" onclick="blsTap(this)">Goggles</button><button class="chip" onclick="blsTap(this)">Hand Sanitizer</button></div>
-
-<div class="bsh">Breathing<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
-<div class="brow"><button class="chip" onclick="blsTap(this)">Oxygen Cannula Adult</button><button class="chip" onclick="blsTap(this)">Face Mask Adult</button><button class="chip" onclick="blsTap(this)">Oxygen Tubing</button><button class="chip" onclick="blsTap(this)">Nebulizer Kit</button><button class="chip" onclick="blsTap(this)">BVM</button><button class="chip" onclick="blsTap(this)">NRM Adult</button><button class="chip" onclick="blsTap(this)">O&#x2082; Cylinder + Regulator</button></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eee">
+  <div style="background:#fff">
+    <div class="bsh" style="font-size:9px">PPE's<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
+    <div class="brow" style="display:flex;flex-wrap:wrap;gap:5px;padding:8px">
+      <button class="chip" onclick="blsTap(this)">Isolation Gown</button>
+      <button class="chip" onclick="blsTap(this)">Disposable Gloves</button>
+      <button class="chip" onclick="blsTap(this)">Sterile Gloves</button>
+      <button class="chip" onclick="blsTap(this)">Disposable Mask</button>
+      <button class="chip" onclick="blsTap(this)">Goggles</button>
+      <button class="chip" onclick="blsTap(this)">Hand Sanitizer</button>
+    </div>
+  </div>
+  <div style="background:#fff;border-left:1px solid #eee">
+    <div class="bsh" style="font-size:9px">Breathing<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
+    <div class="brow" style="display:flex;flex-wrap:wrap;gap:5px;padding:8px">
+      <button class="chip" onclick="blsTap(this)">Oxygen Cannula Adult</button>
+      <button class="chip" onclick="blsTap(this)">Face Mask Adult</button>
+      <button class="chip" onclick="blsTap(this)">Oxygen Tubing</button>
+      <button class="chip" onclick="blsTap(this)">Nebulizer Kit</button>
+      <button class="chip" onclick="blsTap(this)">BVM</button>
+      <button class="chip" onclick="blsTap(this)">NRM Adult</button>
+      <button class="chip" onclick="blsTap(this)">O&#x2082; Cylinder + Regulator</button>
+    </div>
+  </div>
+</div>
 <div style="background:#fff;border-bottom:0.5px solid #eee;padding:8px 12px;display:flex;align-items:center;gap:10px">
   <span style="font-size:12px;font-weight:700;color:#1a1a1a;flex:1">O&#x2082; Level</span>
-  <input type="text" id="bls-o2-level" placeholder="Enter level" style="font-family:inherit;font-size:14px;font-weight:700;border:none;border-bottom:2px solid #1D9E75;outline:none;width:110px;padding:2px 0;color:#1D9E75;background:transparent;text-align:center">
+  <input type="text" id="bls-o2-level" placeholder="Enter level" style="font-family:inherit;font-size:14px;font-weight:700;border:none;border-bottom:2px solid #E91E8C;outline:none;width:110px;padding:2px 0;color:#E91E8C;background:transparent;text-align:center">
 </div>
 
 <div class="bsh">Misc — Upper Left Pouch<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
@@ -2875,7 +2901,7 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div class="bsh dark">Golf Cart — Qualitative Checks<button class="bca" onclick="blsCheckAllSection(this)">Check all</button></div>
 <div class="brow"><button class="chip" onclick="blsTap(this)">Head Light</button><button class="chip" onclick="blsTap(this)">Electric Horn</button><button class="chip" onclick="blsTap(this)">Tail Light</button><button class="chip" onclick="blsTap(this)">Windshield</button><button class="chip" onclick="blsTap(this)">Indicators</button><button class="chip" onclick="blsTap(this)">Mirrors</button><button class="chip" onclick="blsTap(this)">Reverse Alarm</button><button class="chip" onclick="blsTap(this)">Battery Condition</button><button class="chip" onclick="blsTap(this)">Intact Seats</button><button class="chip" onclick="blsTap(this)">Battery Charger</button><button class="chip" onclick="blsTap(this)">Tires</button><button class="chip" onclick="blsTap(this)">Stretcher</button><button class="chip" onclick="blsTap(this)">Cart Number</button><button class="chip" onclick="blsTap(this)">Side Rails</button></div>
 
-<div class="bsh dark">Golf Cart Condition</div>
+<div class="bsh dark" style="background:#9C1B6E">Golf Cart Condition</div>
 <div style="background:#fff;border-bottom:0.5px solid #eee;display:grid;grid-template-columns:1fr 1fr;gap:1px">
   <div style="padding:9px 10px;border-right:0.5px solid #eee">
     <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:5px">Inside</div>
@@ -2898,14 +2924,14 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div class="bnr"><label>Notes / Damage Report</label><textarea id="bls-notes" placeholder="Write any damage or issues here..."></textarea></div>
 
 <div class="bbb">
-  <button style="background:#1D9E75;color:#fff" onclick="blsSave()">Save</button>
+  <button style="background:#E91E8C;color:#fff" onclick="blsSave()" style="background:#E91E8C;color:#fff">Save</button>
   <button style="background:#2c3e50;color:#fff" onclick="blsShowLogs()">Logs</button>
   <button style="background:#eee;color:#333" onclick="blsReset()">Reset</button>
 </div>
 <div class="btoast" id="bls-toast"></div>
 
 <div id="bls-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
-  <div style="background:#1D9E75;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+  <div style="background:#E91E8C;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
     <button onclick="document.getElementById('bls-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
     <div style="font-size:15px;font-weight:800">BLS Bag + Golf Cart Logs</div>
   </div>
@@ -2918,14 +2944,14 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div id="charging-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
 <style>
 #charging-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-#charging-overlay .ch{background:#085041;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#charging-overlay .ch{background:#9C1B6E;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
 #charging-overlay .ch button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
 #charging-overlay .cmg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
 #charging-overlay .cmc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
 #charging-overlay .cmc:last-child{border-right:none}
 #charging-overlay .cml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
 #charging-overlay .cmc input,#charging-overlay .cmc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
-#charging-overlay .csh{background:#085041;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+#charging-overlay .csh{background:#9C1B6E;color:#fff;text-align:center;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
 #charging-overlay .cob{padding:9px 8px;border-radius:7px;border:1.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#444;cursor:pointer;text-align:center;transition:all .12s}
 #charging-overlay .cob.sel{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
 #charging-overlay .cob.sel-r{background:#ffebee;border-color:#c62828;color:#c62828}
@@ -2938,7 +2964,7 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 </style>
 
 <div class="ch">
-  <button onclick="document.getElementById('charging-overlay').style.display='none'">&#8592;</button>
+  <button onclick="document.getElementById('charging-overlay').style.display='none';">&#8592;</button>
   <div style="flex:1"><div style="font-size:14px;font-weight:800">Golf Cart Charging Record</div><div style="font-size:10px;opacity:.8">EMS KAAUH Campus</div></div>
   <div style="display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.2);padding:3px 9px;border-radius:6px">
       <span style="font-size:11px;font-weight:800;color:#fff">KAAUH</span>
@@ -2987,14 +3013,14 @@ function afToast(msg){const t=document.getElementById('af-toast');t.textContent=
 <div class="cnr"><label>Notes</label><textarea id="ch-notes" placeholder="Any notes..."></textarea></div>
 
 <div class="cbb">
-  <button style="background:#085041;color:#fff" onclick="chSave()">Save</button>
+  <button style="background:#9C1B6E;color:#fff" onclick="chSave()">Save</button>
   <button style="background:#2c3e50;color:#fff" onclick="chShowLogs()">Logs</button>
   <button style="background:#eee;color:#333" onclick="chReset()">Reset</button>
 </div>
 <div class="ctoast" id="ch-toast"></div>
 
 <div id="ch-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
-  <div style="background:#085041;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+  <div style="background:#9C1B6E;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
     <button onclick="document.getElementById('ch-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
     <div style="font-size:15px;font-weight:800">Charging Record Logs</div>
   </div>
@@ -3139,6 +3165,12 @@ function chSelCart(btn,num){
   chCartNum=num;
 }
 
+function chSelCharged(btn, val){
+  document.querySelectorAll('#charging-overlay .cob').forEach(b=>b.classList.remove('sel','sel-r'));
+  btn.classList.add(val==='Yes'?'sel':'sel-r');
+  chCharged=val;
+}
+
 function chSave(){
   const name=document.getElementById('ch-name').value.trim();
   const station=document.getElementById('ch-station').value;
@@ -3180,6 +3212,540 @@ function chShowLogs(){
     ${l.notes?`<div style="font-size:11px;color:#555;margin-top:4px">Note: ${l.notes}</div>`:''}
   </div>`).join('');}
   document.getElementById('ch-log-screen').style.display='block';
+}
+</script>
+
+
+<!-- ═══════════════ DAILY REPORT OVERLAY ═══════════════ -->
+<div id="daily-report-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f5f5f5;overflow-y:auto">
+<style>
+#daily-report-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#daily-report-overlay .drh{background:#BA7517;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#daily-report-overlay .drh button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#daily-report-overlay .dr-body{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+#daily-report-overlay .dr-card{background:#fff;border-radius:12px;overflow:hidden;border:0.5px solid #eee}
+#daily-report-overlay .dr-card-hdr{background:#BA7517;color:#fff;font-size:9px;font-weight:800;padding:5px 12px;letter-spacing:.07em;text-transform:uppercase}
+#daily-report-overlay .dr-card-body{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+#daily-report-overlay .dr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#daily-report-overlay .dr-lbl{font-size:11px;color:#666;flex:1}
+#daily-report-overlay .dr-inp{font-family:inherit;font-size:12px;font-weight:600;border:0.5px solid #ddd;border-radius:7px;padding:5px 9px;background:#fafafa;outline:none;color:#1a1a1a}
+#daily-report-overlay .dr-inp-full{width:100%;font-family:inherit;font-size:12px;border:0.5px solid #ddd;border-radius:7px;padding:6px 9px;background:#fafafa;outline:none;color:#1a1a1a}
+#daily-report-overlay .dr-2col{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#daily-report-overlay .dr-num-box{background:#fafafa;border:0.5px solid #ddd;border-radius:8px;padding:7px 8px;display:flex;flex-direction:column;gap:3px}
+#daily-report-overlay .dr-num-lbl{font-size:9px;color:#888;font-weight:600}
+#daily-report-overlay .dr-num-inp{font-family:inherit;font-size:18px;font-weight:700;border:none;outline:none;background:transparent;color:#BA7517;width:100%;padding:0}
+#daily-report-overlay .dr-yn{padding:7px 10px;border-radius:7px;border:0.5px solid #ddd;background:#f5f5f5;font-family:inherit;font-size:11px;font-weight:700;color:#666;cursor:pointer;transition:all .12s;text-align:center}
+#daily-report-overlay .dr-yn.sel{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32}
+#daily-report-overlay .dr-yn.sel-n{background:#ffebee;border-color:#c62828;color:#c62828}
+#daily-report-overlay .dr-textarea{font-family:inherit;font-size:12px;border:0.5px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:55px;outline:none;color:#1a1a1a;background:#fafafa}
+#daily-report-overlay .emp-card{background:#fafafa;border:0.5px solid #eee;border-radius:9px;padding:8px 10px;margin-bottom:6px;position:relative}
+#daily-report-overlay .emp-num{font-size:10px;font-weight:800;color:#BA7517;margin-bottom:6px}
+#daily-report-overlay .emp-del{background:#ffebee;border:none;color:#c62828;font-size:12px;width:22px;height:22px;border-radius:5px;cursor:pointer;font-weight:700}
+#daily-report-overlay .emp-2col{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+#daily-report-overlay .emp-field label{font-size:8px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px}
+#daily-report-overlay .emp-field input,#daily-report-overlay .emp-field select,#daily-report-overlay .emp-field textarea{font-family:inherit;font-size:12px;border:0.5px solid #ddd;border-radius:6px;padding:5px 8px;outline:none;color:#1a1a1a;background:#fff;width:100%}
+#daily-report-overlay .add-btn{background:#fff;border:1px dashed #BA7517;color:#BA7517;font-family:inherit;font-size:12px;font-weight:700;padding:10px;border-radius:9px;width:100%;cursor:pointer;margin-top:2px}
+#daily-report-overlay .dr-submit{background:#BA7517;color:#fff;font-family:inherit;font-size:14px;font-weight:800;padding:13px;border-radius:10px;width:100%;border:none;cursor:pointer;margin-top:4px}
+#daily-report-overlay .dr-logs-btn{background:#2c3e50;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px;border-radius:10px;flex:1;border:none;cursor:pointer}
+#daily-report-overlay .dr-reset-btn{background:#eee;color:#333;font-family:inherit;font-size:13px;font-weight:700;padding:11px;border-radius:10px;flex:1;border:none;cursor:pointer}
+#daily-report-overlay .drtoast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a3a5c;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+</style>
+
+<!-- HEADER -->
+<div class="drh">
+  <button onclick="document.getElementById('daily-report-overlay').style.display='none';">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800">Daily Shift Report</div><div style="font-size:10px;opacity:.75">EMS KAAUH</div></div>
+  <div style="display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:99px">
+    <span style="font-size:10px;font-weight:800;color:#fff">KAAUH</span>
+    <span style="font-size:7px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.05em">EMS</span>
+  </div>
+</div>
+
+<div class="dr-body">
+
+<!-- CARD 1: PRIMARY INFO -->
+<div class="dr-card">
+  <div class="dr-card-hdr">Primary Information</div>
+  <div class="dr-card-body">
+    <div class="dr-2col">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">DATE</div>
+        <input class="dr-inp-full" type="date" id="dr-date">
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">SHIFT</div>
+        <select class="dr-inp-full" id="dr-shift">
+          <option value="">--</option>
+          <option value="Day">Day</option>
+          <option value="Night">Night</option>
+        </select>
+      </div>
+    </div>
+    <div class="dr-2col">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">MEDICAL DIRECTOR</div>
+        <input class="dr-inp-full" type="text" id="dr-director" placeholder="Name">
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">TEAM LEADER</div>
+        <input class="dr-inp-full" type="text" id="dr-tl" placeholder="Name">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD 2: EQUIPMENT -->
+<div class="dr-card">
+  <div class="dr-card-hdr">Equipment</div>
+  <div class="dr-card-body">
+    <div class="dr-2col">
+      <div class="dr-num-box"><div class="dr-num-lbl">Ambulance Keys</div><input class="dr-num-inp" type="number" id="dr-amb-keys" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Remote Gates</div><input class="dr-num-inp" type="number" id="dr-gates" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Huawei Phones</div><input class="dr-num-inp" type="number" id="dr-phones" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Chargers</div><input class="dr-num-inp" type="number" id="dr-chargers" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Bravos</div><input class="dr-num-inp" type="number" id="dr-bravos" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Tablets</div><input class="dr-num-inp" type="number" id="dr-tablets" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Stretcher Batteries</div><input class="dr-num-inp" type="number" id="dr-str-bat" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Oxygen Room Key</div><input class="dr-num-inp" type="number" id="dr-o2-key" value="1" inputmode="numeric" min="0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD 3: CASES -->
+<div class="dr-card">
+  <div class="dr-card-hdr">Cases Summary</div>
+  <div class="dr-card-body">
+    <div class="dr-2col">
+      <div class="dr-num-box"><div class="dr-num-lbl">Emergency</div><input class="dr-num-inp" type="number" id="dr-emerg" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">PNU Cases</div><input class="dr-num-inp" type="number" id="dr-pnu" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">UMC</div><input class="dr-num-inp" type="number" id="dr-umc" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Transfers</div><input class="dr-num-inp" type="number" id="dr-trans" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Home Discharge</div><input class="dr-num-inp" type="number" id="dr-home" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">SRCA</div><input class="dr-num-inp" type="number" id="dr-srca" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Airport Cases</div><input class="dr-num-inp" type="number" id="dr-airport" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box"><div class="dr-num-lbl">Code</div><input class="dr-num-inp" type="number" id="dr-code" placeholder="0" inputmode="numeric" min="0"></div>
+      <div class="dr-num-box" style="grid-column:1/-1"><div class="dr-num-lbl">Urgent Pending Acceptance</div><input class="dr-num-inp" type="number" id="dr-urgent" placeholder="0" inputmode="numeric" min="0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD 4: OPERATIONAL -->
+<div class="dr-card">
+  <div class="dr-card-hdr">Operational Notes</div>
+  <div class="dr-card-body">
+    <div>
+      <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">ENDORSEMENT / HANDOVER</div>
+      <textarea class="dr-textarea" id="dr-endorse" placeholder="Write endorsement notes..."></textarea>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;color:#999;margin-bottom:3px">GENERAL NOTE</div>
+      <textarea class="dr-textarea" id="dr-note" placeholder="Any general notes..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- CARD 5: EMPLOYEES -->
+<div class="dr-card">
+  <div class="dr-card-hdr">Employees / Dispatch</div>
+  <div class="dr-card-body">
+    <div id="dr-emp-list"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="add-btn" style="border-color:#BA7517;color:#BA7517" onclick="drAddEmployee()">+ EMS Employee</button>
+      <button class="add-btn" style="border-color:#1D9E75;color:#1D9E75" onclick="drAddCampusTeam()">+ Campus Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BUTTONS -->
+<div style="display:flex;gap:8px;margin-top:4px;margin-bottom:16px">
+  <button class="dr-logs-btn" onclick="drShowLogs()">Logs</button>
+  <button class="dr-reset-btn" onclick="drReset()">Reset</button>
+</div>
+<button class="dr-submit" onclick="drSave()">Submit Report</button>
+<div style="height:20px"></div>
+
+</div>
+<div class="drtoast" id="dr-toast"></div>
+
+<!-- LOGS SCREEN -->
+<div id="dr-log-screen" style="display:none;position:fixed;inset:0;background:#f5f5f5;z-index:800;overflow-y:auto">
+  <div style="background:#BA7517;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('dr-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Daily Report Logs</div>
+  </div>
+  <div id="dr-log-list" style="padding:10px 12px"></div>
+</div>
+</div>
+
+<script>
+const DAILY_REPORT_URL = 'https://script.google.com/macros/s/AKfycbxMxZq9kbze2C-jDjTBZrelkdutJGZ8kAtinJ1DK1mqM5eCVkAEVztnbA5CAJKIEl_Z/exec';
+const drVals = {};
+let drEmpCount = 0;
+
+const DR_CHECKED_ITEMS = [
+  'Ambulance 6552','Ambulance 4340','Ambulance 4341',
+  'Campus Golf Cart',
+  'Equipment Room 1','Equipment Room 2','Oxygen Room',
+  'Medication Bag 1','Medication Bag 2','All Meds','Other'
+];
+
+function launchDailyReport(){
+  drEmpCount=0;
+  
+  document.getElementById('dr-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('dr-shift').value='';
+  document.getElementById('dr-director').value='';
+  document.getElementById('dr-tl').value='';
+  document.getElementById('dr-endorse').value='';
+  document.getElementById('dr-note').value='';
+  const defVals={'dr-amb-keys':'3','dr-gates':'2','dr-phones':'2','dr-chargers':'4','dr-bravos':'2','dr-tablets':'2','dr-str-bat':'1','dr-o2-key':'1'};
+  ['dr-amb-keys','dr-gates','dr-phones','dr-chargers','dr-bravos','dr-tablets','dr-str-bat','dr-o2-key',
+   'dr-emerg','dr-pnu','dr-umc','dr-trans','dr-home','dr-srca','dr-airport','dr-code','dr-urgent'
+  ].forEach(id=>{const el=document.getElementById(id);if(el)el.value=defVals[id]||'';});
+  
+  document.getElementById('dr-emp-list').innerHTML='';
+  document.getElementById('daily-report-overlay').style.display='block';
+  document.getElementById('daily-report-overlay').scrollTop=0;
+}
+
+function drYN(btn,group,val){
+  btn.closest('div').querySelectorAll('.dr-yn').forEach(b=>b.classList.remove('sel','sel-n'));
+  btn.classList.add(val==='Yes'?'sel':'sel-n');
+  drVals[group]=val;
+}
+
+function drAddEmployee(){
+  drEmpCount++;
+  const idx=drEmpCount;
+  const empNum=document.querySelectorAll('#dr-emp-list .emp-card[id^="emp-"]').length+1;
+  const div=document.createElement('div');
+  div.className='emp-card';
+  div.id='emp-'+idx;
+  div.style.borderLeft='3px solid #BA7517';
+  div.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div class="emp-num" style="margin:0">EMS Employee #${empNum}</div>
+      <button class="emp-del" style="position:relative;top:auto;right:auto" onclick="document.getElementById('emp-${idx}').remove()">✕</button>
+    </div>
+    <div class="emp-2col">
+      <div class="emp-field"><label>Name</label><input type="text" id="emp-name-${idx}" placeholder="Full name"></div>
+      <div class="emp-field"><label>ID</label><input type="text" id="emp-id-${idx}" placeholder="Badge No."></div>
+    </div>
+    <div class="emp-field" style="margin-bottom:6px">
+      <label>Checked Item</label>
+      <select id="emp-item-${idx}">
+        <option value="">-- Select --</option>
+        ${DR_CHECKED_ITEMS.map(item=>`<option value="${item}">${item}</option>`).join('')}
+      </select>
+    </div>
+    <div class="emp-2col">
+      <div class="emp-field"><label>Dispatch From</label><input type="time" id="emp-from-${idx}"></div>
+      <div class="emp-field"><label>Dispatch To</label><input type="time" id="emp-to-${idx}"></div>
+    </div>
+    <div class="emp-field" style="margin-top:6px">
+      <label>Note</label>
+      <textarea id="emp-note-${idx}" placeholder="Any note..." style="min-height:36px"></textarea>
+    </div>`;
+  document.getElementById('dr-emp-list').appendChild(div);
+}
+
+function drAddCampusTeam(){
+  drEmpCount++;
+  const idx=drEmpCount;
+  const div=document.createElement('div');
+  div.className='emp-card';
+  div.id='campus-'+idx;
+  div.style.borderLeft='3px solid #1D9E75';
+  div.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="emp-num" style="margin:0;color:#1D9E75">Campus Team</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:#E1F5EE;color:#085041">Campus</span>
+        <button class="emp-del" style="position:relative;top:auto;right:auto" onclick="document.getElementById('campus-${idx}').remove()">✕</button>
+      </div>
+    </div>
+    <div class="emp-field" style="margin-bottom:8px">
+      <label>Station</label>
+      <select id="campus-station-${idx}">
+        <option value="">-- Select Station --</option>
+        <option value="A2">A2</option>
+        <option value="A6">A6</option>
+        <option value="A10">A10</option>
+      </select>
+    </div>
+    <div style="height:0.5px;background:#eee;margin-bottom:8px"></div>
+    <div style="font-size:10px;font-weight:700;color:#1D9E75;margin-bottom:5px">Staff 1</div>
+    <div class="emp-2col" style="margin-bottom:8px">
+      <div class="emp-field"><label>Name</label><input type="text" id="campus-name1-${idx}" placeholder="Full name"></div>
+      <div class="emp-field"><label>ID</label><input type="text" id="campus-id1-${idx}" placeholder="Badge No."></div>
+    </div>
+    <div style="height:0.5px;background:#eee;margin-bottom:8px"></div>
+    <div style="font-size:10px;font-weight:700;color:#1D9E75;margin-bottom:5px">Staff 2</div>
+    <div class="emp-2col">
+      <div class="emp-field"><label>Name</label><input type="text" id="campus-name2-${idx}" placeholder="Full name"></div>
+      <div class="emp-field"><label>ID</label><input type="text" id="campus-id2-${idx}" placeholder="Badge No."></div>
+    </div>`;
+  document.getElementById('dr-emp-list').appendChild(div);
+}
+
+function drSave(){
+  const date=document.getElementById('dr-date').value;
+  const shift=document.getElementById('dr-shift').value;
+  const director=document.getElementById('dr-director').value.trim();
+  const tl=document.getElementById('dr-tl').value.trim();
+  if(!date){drToast('⚠ Select date');return;}
+  if(!shift){drToast('⚠ Select shift');return;}
+  if(!director){drToast('⚠ Enter Medical Director');return;}
+  if(!tl){drToast('⚠ Enter Team Leader');return;}
+
+  const employees=[];
+  document.querySelectorAll('#dr-emp-list .emp-card').forEach(card=>{
+    if(card.id.startsWith('emp-')){
+      const id=card.id.replace('emp-','');
+      const name=document.getElementById('emp-name-'+id)?.value.trim()||'';
+      const empId=document.getElementById('emp-id-'+id)?.value.trim()||'';
+      const item=document.getElementById('emp-item-'+id)?.value||'';
+      const from=document.getElementById('emp-from-'+id)?.value||'';
+      const to=document.getElementById('emp-to-'+id)?.value||'';
+      const note=document.getElementById('emp-note-'+id)?.value.trim()||'N/A';
+      if(name) employees.push({name,id:empId,item,from,to,note,date,shift,type:'EMS'});
+    } else if(card.id.startsWith('campus-')){
+      const id=card.id.replace('campus-','');
+      const station=document.getElementById('campus-station-'+id)?.value||'';
+      const name1=document.getElementById('campus-name1-'+id)?.value.trim()||'';
+      const id1=document.getElementById('campus-id1-'+id)?.value.trim()||'';
+      const name2=document.getElementById('campus-name2-'+id)?.value.trim()||'';
+      const id2=document.getElementById('campus-id2-'+id)?.value.trim()||'';
+      if(name1) employees.push({name:name1,id:id1,item:'Campus '+station,from:'',to:'',note:'',date,shift,type:'Campus',station});
+      if(name2) employees.push({name:name2,id:id2,item:'Campus '+station,from:'',to:'',note:'',date,shift,type:'Campus',station});
+    }
+  });
+
+  const dailyData={
+    type:'Daily Report',date,shift,
+    medical_director:director,team_leader:tl,
+    ambulance_keys:document.getElementById('dr-amb-keys')?.value||'0',
+    remote_gates:document.getElementById('dr-gates')?.value||'0',
+    huawei_phones:document.getElementById('dr-phones')?.value||'0',
+    chargers:document.getElementById('dr-chargers')?.value||'0',
+    bravos:document.getElementById('dr-bravos')?.value||'0',
+    tablets:document.getElementById('dr-tablets')?.value||'0',
+    stretcher_batteries:document.getElementById('dr-str-bat')?.value||'0',
+    emergency_cases:document.getElementById('dr-emerg')?.value||'0',
+    pnu_cases:document.getElementById('dr-pnu')?.value||'0',
+    umc:document.getElementById('dr-umc')?.value||'0',
+    transfers:document.getElementById('dr-trans')?.value||'0',
+    home_discharge:document.getElementById('dr-home')?.value||'0',
+    srca:document.getElementById('dr-srca')?.value||'0',
+    airport_cases:document.getElementById('dr-airport')?.value||'0',
+    code:document.getElementById('dr-code')?.value||'0',
+    urgent_pending:document.getElementById('dr-urgent')?.value||'0',
+    oxygen_room_key:document.getElementById('dr-o2-key')?.value||'0',
+    endorsement:document.getElementById('dr-endorse')?.value.trim()||'',
+    general_note:document.getElementById('dr-note')?.value.trim()||'',
+    employee_count:employees.length,
+    employees_data:employees.map(e=>`${e.name}/${e.id}/${e.item}/${e.from}-${e.to}/${e.note}`).join(' | '),
+    status:'COMPLETE'
+  };
+
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('daily_report_logs')||'[]');}catch(e){}
+  logs.unshift({...dailyData,time:new Date().toLocaleString('en-GB'),employees});
+  if(logs.length>30)logs=logs.slice(0,30);
+  localStorage.setItem('daily_report_logs',JSON.stringify(logs));
+
+  if(DAILY_REPORT_URL!=='YOUR_DAILY_REPORT_URL_HERE'){
+    fetch(DAILY_REPORT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'daily',...dailyData})}).catch(()=>{});
+    employees.forEach(emp=>{
+      fetch(DAILY_REPORT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'employees',...emp})}).catch(()=>{});
+    });
+    drToast('✅ Report submitted!');
+  } else {
+    drToast('✅ Saved locally!');
+  }
+}
+
+function drReset(){
+  if(!confirm('Reset all fields?')) return;
+  drEmpCount=0;
+  document.getElementById('dr-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('dr-shift').value='';
+  document.getElementById('dr-director').value='';
+  document.getElementById('dr-tl').value='';
+  document.getElementById('dr-endorse').value='';
+  document.getElementById('dr-note').value='';
+  const defVals2={'dr-amb-keys':'3','dr-gates':'2','dr-phones':'2','dr-chargers':'4','dr-bravos':'2','dr-tablets':'2','dr-str-bat':'1','dr-o2-key':'1'};
+  ['dr-amb-keys','dr-gates','dr-phones','dr-chargers','dr-bravos','dr-tablets','dr-str-bat','dr-o2-key',
+   'dr-emerg','dr-pnu','dr-umc','dr-trans','dr-home','dr-srca','dr-airport','dr-code','dr-urgent'
+  ].forEach(id=>{const el=document.getElementById(id);if(el)el.value=defVals2[id]||'';});
+  document.querySelectorAll('#daily-report-overlay .dr-yn').forEach(b=>b.classList.remove('sel','sel-n'));
+  document.getElementById('dr-emp-list').innerHTML='';
+  drToast('\u2705 Form reset');
+}
+function drToast(msg){const t=document.getElementById('dr-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+
+function drShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('daily_report_logs')||'[]'));}catch(e){}
+  const list=document.getElementById('dr-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No reports yet</div>';}
+  else{list.innerHTML=logs.map(l=>`<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee">
+    <div style="font-size:10px;color:#888;margin-bottom:3px">${l.time||''}</div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:4px">${l.date||''} · ${l.shift||''} Shift</div>
+    <div style="font-size:12px;color:#444;margin-bottom:3px">TL: <b>${l.team_leader||'—'}</b> · MD: <b>${l.medical_director||'—'}</b></div>
+    <div style="font-size:12px;color:#444;margin-bottom:5px">Employees: <b>${l.employee_count||0}</b></div>
+    <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:#e8f5e9;color:#2e7d32">✅ Submitted</span>
+  </div>`).join('');}
+  document.getElementById('dr-log-screen').style.display='block';
+}
+</script>
+
+
+<!-- NORA BAG STOCK -->
+<div id="nora-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#f0f2f5;overflow-y:auto">
+<style>
+#nora-overlay *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+#nora-overlay .nh{background:linear-gradient(135deg,#8B5E0A,#BA7517);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+#nora-overlay .nh button{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700}
+#nora-overlay .nmg{background:#fff;display:grid;gap:1px;border-bottom:1px solid #ddd}
+#nora-overlay .nmc{padding:7px 10px;display:flex;flex-direction:column;gap:2px;border-right:0.5px solid #eee}
+#nora-overlay .nmc:last-child{border-right:none}
+#nora-overlay .nml{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;text-transform:uppercase}
+#nora-overlay .nmc input,#nora-overlay .nmc select{font-family:inherit;font-size:13px;font-weight:600;border:none;outline:none;background:transparent;color:#1a1a1a;width:100%}
+#nora-overlay .nsh{background:#BA7517;color:#fff;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-top:2px;display:flex;align-items:center;justify-content:space-between}
+#nora-overlay .nca{background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.9);font-family:inherit;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;cursor:pointer}
+#nora-overlay .nrow{background:#fff;border-bottom:0.5px solid #eee;padding:8px 10px;display:flex;flex-wrap:wrap;gap:5px}
+#nora-overlay .nchip{display:inline-flex;align-items:center;padding:8px 12px;border-radius:7px;border:1.5px solid #ccc;background:#f5f5f5;font-family:inherit;font-size:12px;font-weight:700;color:#555;cursor:pointer;transition:all .12s;user-select:none}
+#nora-overlay .nchip.found{background:#e8f5e9!important;border-color:#2e7d32!important;color:#2e7d32!important}
+#nora-overlay .nchip.notfound{background:#ffebee!important;border-color:#c62828!important;color:#c62828!important}
+#nora-overlay .npw{background:#fff;padding:7px 12px;border-bottom:1px solid #eee;position:sticky;top:44px;z-index:5}
+#nora-overlay .npt{height:5px;background:#e0e0e0;border-radius:99px;overflow:hidden}
+#nora-overlay .npf{height:5px;background:#BA7517;border-radius:99px;transition:width .3s}
+#nora-overlay .npx{font-size:10px;color:#888;margin-top:3px;display:flex;justify-content:space-between}
+#nora-overlay .seal-box{background:#fff;border:2px solid #BA7517;border-radius:10px;padding:12px 14px;margin:10px 12px}
+#nora-overlay .seal-lbl{font-size:10px;font-weight:700;color:#BA7517;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+#nora-overlay .seal-inp{font-family:inherit;font-size:20px;font-weight:800;border:none;border-bottom:2px solid #6B3FA0;outline:none;width:100%;padding:4px 0;color:#BA7517;background:transparent;text-align:center;letter-spacing:.1em}
+#nora-overlay .ntxt{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:7px;padding:7px 9px;width:100%;resize:vertical;min-height:55px;outline:none;color:#1a1a1a;background:#fafafa}
+#nora-overlay .nbb{background:#fff;border-top:1px solid #ddd;padding:10px 12px;display:flex;gap:8px;position:sticky;bottom:0}
+#nora-overlay .nbb button{flex:1;padding:12px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+#nora-overlay .ntoast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#BA7517;color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+</style>
+<div class="nh">
+  <button onclick="document.getElementById('nora-overlay').style.display='none'">&#8592;</button>
+  <div style="flex:1"><div style="font-size:14px;font-weight:800">Coverage Bag Stock Check</div><div style="font-size:10px;opacity:.75">Bag Refill &amp; Seal</div></div>
+  <div style="display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:99px">
+    <span style="font-size:10px;font-weight:800;color:#fff">KAAUH</span><span style="font-size:7px;font-weight:700;color:rgba(255,255,255,.8)">EMS</span>
+  </div>
+</div>
+<div class="nmg" style="grid-template-columns:1fr 1fr">
+  <div class="nmc"><span class="nml">Date</span><input type="date" id="nora-date"></div>
+  <div class="nmc"><span class="nml">Shift</span><select id="nora-shift"><option value="">--</option><option>D Day</option><option>N Night</option></select></div>
+</div>
+<div class="nmg" style="grid-template-columns:1fr 1fr">
+  <div class="nmc"><span class="nml">Name</span><input type="text" id="nora-name" placeholder="Your name"></div>
+  <div class="nmc"><span class="nml">ID</span><input type="text" id="nora-id" placeholder="Badge No."></div>
+</div>
+<div class="npw"><div class="npt"><div class="npf" id="nora-pf" style="width:0%"></div></div>
+<div class="npx"><span id="nora-pt">0 of 0 checked</span><span id="nora-pp">0%</span></div></div>
+<div class="nsh"><span>Airway</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">OPA 000</button><button class="nchip" onclick="noraTap(this)">OPA OO</button><button class="nchip" onclick="noraTap(this)">OPA 0</button><button class="nchip" onclick="noraTap(this)">OPA 1</button><button class="nchip" onclick="noraTap(this)">OPA 2</button><button class="nchip" onclick="noraTap(this)">OPA 3</button><button class="nchip" onclick="noraTap(this)">OPA 4</button><button class="nchip" onclick="noraTap(this)">NPA 6</button><button class="nchip" onclick="noraTap(this)">NPA 7</button><button class="nchip" onclick="noraTap(this)">NPA 7.5</button><button class="nchip" onclick="noraTap(this)">NPA 8</button><button class="nchip" onclick="noraTap(this)">NPA 8.5</button><button class="nchip" onclick="noraTap(this)">NPA 9</button><button class="nchip" onclick="noraTap(this)">Sterile Gloves 7</button><button class="nchip" onclick="noraTap(this)">Sterile Gloves 7.5</button><button class="nchip" onclick="noraTap(this)">Sterile Gloves 8</button></div>
+<div class="nsh"><span>Ventilation &amp; Accessories</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">NC Adult</button><button class="nchip" onclick="noraTap(this)">NC Pedia</button><button class="nchip" onclick="noraTap(this)">FM Adult</button><button class="nchip" onclick="noraTap(this)">FM Pedia</button><button class="nchip" onclick="noraTap(this)">NRM Adult</button><button class="nchip" onclick="noraTap(this)">NRM Pedia</button><button class="nchip" onclick="noraTap(this)">Neb Kit w/ Mask Adult</button><button class="nchip" onclick="noraTap(this)">Neb Kit w/ Mask Pedia</button><button class="nchip" onclick="noraTap(this)">Nebulizer Kit No Mask</button><button class="nchip" onclick="noraTap(this)">Oxygen Tube</button><button class="nchip" onclick="noraTap(this)">BVM Adult</button><button class="nchip" onclick="noraTap(this)">BVM Child</button><button class="nchip" onclick="noraTap(this)">BVM Infant</button><button class="nchip" onclick="noraTap(this)">Vomiting Bag</button></div>
+<div class="nsh"><span>Medications</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">Voltarin Gel</button><button class="nchip" onclick="noraTap(this)">Salbutamol Inhaler</button><button class="nchip" onclick="noraTap(this)">Ondansetron</button><button class="nchip" onclick="noraTap(this)">Paracetamol</button><button class="nchip" onclick="noraTap(this)">Hyoscine Butilbromide</button><button class="nchip" onclick="noraTap(this)">Domperidone</button><button class="nchip" onclick="noraTap(this)">Glucagone</button><button class="nchip" onclick="noraTap(this)">Flamazine</button></div>
+<div class="nsh"><span>Suction &amp; Dressing</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">Irrigating Solution</button><button class="nchip" onclick="noraTap(this)">Yankauer Suction</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 8</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 10</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 12</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 14</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 16</button><button class="nchip" onclick="noraTap(this)">Suction Catheter 18</button><button class="nchip" onclick="noraTap(this)">Nursing Dressing Pack</button><button class="nchip" onclick="noraTap(this)">Sterile Gauze 90x90</button><button class="nchip" onclick="noraTap(this)">Sterile Gauze 10x10</button><button class="nchip" onclick="noraTap(this)">Sterile Gauze 5x5</button><button class="nchip" onclick="noraTap(this)">Burn Pad</button><button class="nchip" onclick="noraTap(this)">Swabstick Betadine</button><button class="nchip" onclick="noraTap(this)">Chest Seal</button><button class="nchip" onclick="noraTap(this)">SAM Splint</button><button class="nchip" onclick="noraTap(this)">Triangular Bandage</button><button class="nchip" onclick="noraTap(this)">Thermal Blanket</button><button class="nchip" onclick="noraTap(this)">Elastic Bandage 10</button><button class="nchip" onclick="noraTap(this)">Elastic Bandage 5</button><button class="nchip" onclick="noraTap(this)">Elastic Bandage 2.5</button></div>
+<div class="nsh"><span>Devices</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">Zoll</button><button class="nchip" onclick="noraTap(this)">Digital Thermometer</button><button class="nchip" onclick="noraTap(this)">Suction Device</button><button class="nchip" onclick="noraTap(this)">ECG Electrodes</button><button class="nchip" onclick="noraTap(this)">Glucometer Kit</button><button class="nchip" onclick="noraTap(this)">Lancets</button><button class="nchip" onclick="noraTap(this)">Sterile Strips</button><button class="nchip" onclick="noraTap(this)">Eyepad</button><button class="nchip" onclick="noraTap(this)">Tongue Depressor</button></div>
+<div class="nsh"><span>IV / Blood</span><button class="nca" onclick="noraCheckAll(this)">Check all</button></div>
+<div class="nrow"><button class="nchip" onclick="noraTap(this)">IV Set</button><button class="nchip" onclick="noraTap(this)">IV Cannula 16</button><button class="nchip" onclick="noraTap(this)">IV Cannula 18</button><button class="nchip" onclick="noraTap(this)">IV Cannula 20</button><button class="nchip" onclick="noraTap(this)">IV Cannula 22</button><button class="nchip" onclick="noraTap(this)">IV Cannula 24</button><button class="nchip" onclick="noraTap(this)">IV Cannula 26</button><button class="nchip" onclick="noraTap(this)">Butterfly</button><button class="nchip" onclick="noraTap(this)">All Sizes Needle</button><button class="nchip" onclick="noraTap(this)">All Sizes Syringe</button><button class="nchip" onclick="noraTap(this)">Alcohol Swab</button><button class="nchip" onclick="noraTap(this)">Swabstick Chlorhex 1 St</button><button class="nchip" onclick="noraTap(this)">Swabstick Chlorhex 3 St</button><button class="nchip" onclick="noraTap(this)">Bandage Scissors</button><button class="nchip" onclick="noraTap(this)">IV Tourniquet</button><button class="nchip" onclick="noraTap(this)">Plaster</button><button class="nchip" onclick="noraTap(this)">IV Securement Dressing</button><button class="nchip" onclick="noraTap(this)">IV Sterile Drapes</button></div>
+<div style="padding:10px 12px">
+  <div class="seal-box">
+    <div class="seal-lbl">New Seal Number</div>
+    <input class="seal-inp" type="text" id="nora-seal" placeholder="Enter seal number">
+  </div>
+</div>
+<div style="background:#fff;padding:10px 12px;border-bottom:0.5px solid #eee">
+  <div style="font-size:9px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:4px">Notes</div>
+  <textarea class="ntxt" id="nora-notes" placeholder="Any notes about the bag..."></textarea>
+</div>
+<div class="nbb">
+  <button style="background:#BA7517;color:#fff" onclick="noraSave()">Save &amp; Seal</button>
+  <button style="background:#2c3e50;color:#fff" onclick="noraShowLogs()">Logs</button>
+  <button style="background:#eee;color:#333" onclick="noraReset()">Reset</button>
+</div>
+<div class="ntoast" id="nora-toast"></div>
+<div id="nora-log-screen" style="display:none;position:fixed;inset:0;background:#f0f2f5;z-index:800;overflow-y:auto">
+  <div style="background:#BA7517;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0">
+    <button onclick="document.getElementById('nora-log-screen').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:7px;cursor:pointer;font-weight:700">&#8592;</button>
+    <div style="font-size:15px;font-weight:800">Bag Stock Logs</div>
+  </div>
+  <div id="nora-log-list" style="padding:10px 12px"></div>
+</div>
+</div>
+<script>
+const COVERAGE_BAG_URL='YOUR_COVERAGE_BAG_URL_HERE';
+function launchNoraBagStock(){
+  document.getElementById('nora-date').value=new Date().toISOString().split('T')[0];
+  ['nora-shift','nora-name','nora-id','nora-seal','nora-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('#nora-overlay .nchip').forEach(c=>c.classList.remove('found','notfound'));
+  noraProg();
+  document.getElementById('nora-overlay').style.display='block';
+  document.getElementById('nora-overlay').scrollTop=0;
+}
+function noraTap(btn){
+  if(btn.classList.contains('found')){btn.classList.remove('found');btn.classList.add('notfound');}
+  else if(btn.classList.contains('notfound')){btn.classList.remove('notfound');}
+  else{btn.classList.add('found');}
+  noraProg();
+}
+function noraCheckAll(btn){
+  const sh=btn.closest('.nsh');if(!sh)return;
+  let el=sh.nextElementSibling;const chips=[];
+  while(el&&el.classList.contains('nrow')){el.querySelectorAll('.nchip').forEach(c=>chips.push(c));el=el.nextElementSibling;}
+  const allFound=chips.every(c=>c.classList.contains('found'));
+  chips.forEach(c=>{c.classList.remove('found','notfound');if(!allFound)c.classList.add('found');});
+  btn.textContent=allFound?'Check all':'Uncheck all';noraProg();
+}
+function noraProg(){
+  const all=document.querySelectorAll('#nora-overlay .nchip');
+  const done=[...all].filter(c=>c.classList.contains('found')||c.classList.contains('notfound')).length;
+  const pct=all.length?Math.round(done/all.length*100):0;
+  const f=document.getElementById('nora-pf');f.style.width=pct+'%';f.style.background=pct===100?'#2e7d32':'#BA7517';
+  document.getElementById('nora-pt').textContent=done+' of '+all.length+' checked';
+  document.getElementById('nora-pp').textContent=pct+'%';
+}
+function noraSave(){
+  const name=document.getElementById('nora-name').value.trim();
+  const shift=document.getElementById('nora-shift').value;
+  const seal=document.getElementById('nora-seal').value.trim();
+  const date=document.getElementById('nora-date').value;
+  const missing=[];
+  if(!name)missing.push('Name');if(!shift)missing.push('Shift');if(!seal)missing.push('Seal Number');
+  if(missing.length){noraToast('⚠ Missing: '+missing.join(', '));return;}
+  const chips=[...document.querySelectorAll('#nora-overlay .nchip')];
+  const unchecked=chips.filter(c=>!c.classList.contains('found')&&!c.classList.contains('notfound'));
+  if(unchecked.length){const names=unchecked.slice(0,3).map(c=>c.textContent.trim()).join(', ');if(!confirm('⚠ '+unchecked.length+' items not checked: '+names+(unchecked.length>3?' ...':'')+'. Save anyway?'))return;}
+  const notFound=chips.filter(c=>c.classList.contains('notfound')).map(c=>c.textContent.trim());
+  const data={type:'Coverage Bag Stock',date,shift,name,id:document.getElementById('nora-id').value.trim(),seal_number:seal,not_found_count:notFound.length,not_found_list:notFound.join(', ')||'All items present',notes:document.getElementById('nora-notes').value.trim(),status:'SEALED'};
+  let logs=[];try{logs=JSON.parse(localStorage.getItem('nora_bag_logs')||'[]');}catch(e){}
+  logs.unshift({...data,time:new Date().toLocaleString('en-GB')});
+  if(logs.length>30)logs=logs.slice(0,30);
+  localStorage.setItem('nora_bag_logs',JSON.stringify(logs));
+  if(COVERAGE_BAG_URL!=='YOUR_COVERAGE_BAG_URL_HERE'){
+    fetch(COVERAGE_BAG_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(()=>{noraToast('✅ Bag sealed & saved!');setTimeout(()=>document.getElementById('nora-overlay').style.display='none',1500);}).catch(()=>{noraToast('✅ Saved locally');setTimeout(()=>document.getElementById('nora-overlay').style.display='none',1500);});
+  }else{noraToast('✅ Bag sealed & saved!');setTimeout(()=>document.getElementById('nora-overlay').style.display='none',1500);}
+}
+function noraReset(){
+  ['nora-shift','nora-name','nora-id','nora-seal','nora-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('#nora-overlay .nchip').forEach(c=>c.classList.remove('found','notfound'));
+  noraProg();noraToast('Form reset');
+}
+function noraToast(msg){const t=document.getElementById('nora-toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function noraShowLogs(){
+  const logs=[];try{logs.push(...JSON.parse(localStorage.getItem('nora_bag_logs')||'[]'));}catch(e){}
+  const list=document.getElementById('nora-log-list');
+  if(!logs.length){list.innerHTML='<div style="text-align:center;padding:30px;color:#aaa">No submissions yet</div>';}
+  else{list.innerHTML=logs.map(l=>'<div style="background:#fff;border-radius:9px;padding:12px 14px;margin-bottom:8px;border:0.5px solid #eee"><div style="font-size:10px;color:#888;margin-bottom:3px">'+l.time+'</div><div style="font-size:14px;font-weight:700;margin-bottom:4px">'+(l.name||'--')+' · '+(l.shift||'--')+'</div><div style="font-size:12px;color:#444;margin-bottom:4px">Seal: <b style="color:#BA7517">'+(l.seal_number||'--')+'</b></div>'+(l.not_found_count>0?'<div style="font-size:11px;color:#c62828">✗ '+l.not_found_count+' missing: '+l.not_found_list+'</div>':'<div style="font-size:11px;color:#2e7d32">✅ All items present</div>')+(l.notes?'<div style="font-size:11px;color:#555;margin-top:3px">'+l.notes+'</div>':'')+'</div>').join('');}
+  document.getElementById('nora-log-screen').style.display='block';
 }
 </script>
 
