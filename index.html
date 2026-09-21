@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEC Shift Endorsement</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='16 12 128 132'%3E%3Cpath d='M32 128V40L80 92L128 40V128' fill='none' stroke='%2300605F' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M69 124L80 110L91 124' fill='none' stroke='%23C9A227' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#00605F; --gold:#00A9A5; --cream:#FFFFFF;
+  --ink:#1C2B2B; --muted:#6B7C7C; --line:#D9E4E4; --bg:#F2F7F7; --panel:#F7FBFB;
+  --ok:#0E8A6A; --pend:#B8860B; --red:#A33131;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:14px}
+button,input,select,textarea{font-family:inherit;font-size:14px;color:inherit}
+a{color:var(--green)}
+.wrap{max-width:960px;margin:0 auto;padding:18px 16px 72px}
+
+/* app bar */
+.appbar{background:var(--green);color:var(--cream);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+.appbar .t{font-size:15px;font-weight:600}
+.appbar .sp{margin-left:auto;font-size:12.5px;opacity:.85;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.appbar .lnk{color:var(--cream);background:rgba(255,255,255,.14);border:0;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12.5px}
+.appbar select.lnk option{color:var(--ink)}
+.logo{width:24px;height:24px;flex:none}
+
+/* generic */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.card.hl{border-left:4px solid var(--gold);background:#F5FBFB}
+.card.locked{position:relative;overflow:hidden}
+.card.locked > *{filter:blur(1.5px);pointer-events:none;user-select:none}
+.card.locked .lockmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(242,247,247,.75);filter:none;pointer-events:auto;font-weight:500;color:var(--green);text-align:center;padding:20px}
+h2.sec{font-size:12px;color:var(--green);margin:22px 0 10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:8px}
+h2.sec:first-child{margin-top:4px}
+h2.sec small{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+.muted{color:var(--muted);font-size:12.5px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.pill.pend{background:#FBF3DC;color:var(--pend)}
+.pill.ok{background:#E6F2EA;color:var(--ok)}
+.pill.late{background:#F8E7E7;color:var(--red)}
+.pill.info{background:#E4F2F2;color:var(--green)}
+.btn{font-weight:500;border:0;border-radius:8px;padding:10px 18px;cursor:pointer;background:var(--green);color:var(--cream)}
+.btn.g{background:var(--gold);color:#fff}
+.btn.o{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.sm{padding:7px 12px;font-size:13px}
+.btn.danger{background:#fff;border:1px solid #E7C9C9;color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fld{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:#fff}
+textarea.fld{min-height:80px;resize:vertical;line-height:1.6}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;width:110px;text-align:center;border:1px solid var(--line);border-radius:6px;padding:7px;background:#fff}
+label.l{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.tw{border:1px solid var(--line);border-radius:8px;overflow:auto;background:#fff}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--green);color:var(--cream);font-weight:500;font-size:11px;padding:9px 12px;text-align:left;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+tbody td{border-bottom:1px solid var(--line);padding:9px 12px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+td.mono,.mono{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.kv>div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.kv .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.kv .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;color:var(--green);margin-top:2px}
+.kv .v.txt{font-family:Inter,sans-serif;font-size:14px;font-weight:500}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;cursor:pointer;font-weight:500}
+.chip small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.chip.on{background:var(--green);border-color:var(--green);color:var(--cream)}
+.chip.on small{color:rgba(255,255,255,.8)}
+.stepper{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.step{flex:1;min-width:120px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 12px;cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
+.step .n{width:20px;height:20px;border-radius:50%;background:var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:none}
+.step.on{border-color:var(--green);color:var(--green)}
+.step.on .n{background:var(--green);color:var(--cream)}
+.step.done .n{background:var(--ok);color:#fff}
+.flag{border:1px solid #E7C9C9;background:#FDF3F3;color:var(--red);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.okbox{border:1px solid #CFE6D8;background:#F0F8F3;color:var(--ok);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.note{border:1px solid var(--line);border-left:4px solid var(--gold);background:#fff;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;color:#3A4A4A;margin-bottom:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13px}
+.tab.on{background:var(--green);border-color:var(--green);color:var(--cream)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.hidden{display:none!important}
+body.busy .btn,body.busy .lnk,body.busy .chip{opacity:.55;pointer-events:none}
+body.busy::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:var(--gold);animation:bar 1s linear infinite;z-index:10}
+@keyframes bar{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.big{border-radius:14px;padding:20px;text-align:left;border:2px solid transparent;min-height:118px;display:flex;flex-direction:column;gap:6px;cursor:pointer;font:inherit}
+.big .t{font-size:16px;font-weight:600}.big .d{font-size:12.5px;opacity:.85}
+.big.grey{background:#E3EAEA;color:#5A6B6B;border-color:#D3DDDD}
+.big.done{background:var(--green);color:var(--cream)}
+.big.warn{background:#fff;color:var(--ink);border-color:var(--gold)}
+.big:disabled{opacity:.55;cursor:not-allowed}
+.big .st{margin-top:auto;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--green);cursor:pointer;padding:8px 14px;font-size:13.5px;font-weight:500}
+.back:hover{border-color:var(--green)}
+.abox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.abox .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}.abox .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;color:var(--green);margin-top:2px}.abox.bad .v{color:var(--red)}.abox.bad{border-color:#E7C9C9;background:#FDF3F3}
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0 8px}
+.node{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;min-width:150px;font-size:13px}.node b{display:block}.node span{display:block;font-size:12px}.node.bad{border-color:#E7C9C9;background:#FDF3F3}.node.wait{border-color:#F3E2B0;background:#FFFBEE}
+.arrow{color:var(--muted);font-size:12px;text-align:center;min-width:110px}.arrow.bad{color:var(--red);font-weight:600}
+.lnk2{background:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px}
+.eval{display:grid;grid-template-columns:1fr 90px;gap:6px 10px;align-items:center;font-size:13px}
+.eval .ar{font-size:11.5px;color:var(--muted)}
+.scale{display:flex;gap:4px}
+.scale button{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-weight:600;font-size:12.5px}
+.scale button.on{background:var(--green);border-color:var(--green);color:#fff}
+
+/* sign in */
+.signin{max-width:400px;margin:56px auto 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center}
+.signin .mark{width:56px;height:56px;margin:0 auto 14px}
+.signin h1{font-size:20px;color:var(--green);margin:0 0 4px;font-weight:700}
+.signin p{color:var(--muted);font-size:13px;margin:0 0 26px}
+.signin .f{text-align:left;margin-bottom:13px}
+.pick{width:100%;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:8px;padding:11px 12px;background:#fff;cursor:pointer;font-size:15px;text-align:left}
+.pick.on{border-color:var(--green);color:var(--ink);font-weight:500}
+.picker{border:1px solid var(--line);border-radius:10px;margin-top:8px;padding:10px;background:#fff;box-shadow:0 12px 30px -18px rgba(0,60,60,.5)}
+.plist{max-height:260px;overflow:auto;margin-top:8px}
+.prow{width:100%;display:flex;justify-content:space-between;align-items:center;border:0;border-bottom:1px solid var(--line);background:#fff;padding:11px 8px;cursor:pointer;text-align:left;font-size:14.5px}
+.prow:last-child{border-bottom:0}.prow:hover{background:var(--panel)}
+.signin .btn{width:100%;margin-top:8px}
+.demo{margin-top:20px;font-size:12px;color:var(--muted);text-align:left}
+.demo code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11.5px}
+
+@media(max-width:640px){
+  .num{width:84px}
+  .eval{grid-template-columns:1fr}
+  .kv .v{font-size:16px}
+}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ma-logo" viewBox="16 12 128 132">
+    <path d="M32 128V40L80 92L128 40V128" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M69 124L80 110L91 124" fill="none" stroke="#C9A227" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   TEC Shift Endorsement — single-file app
+   Backend: Google Apps Script + Google Sheets (Code.gs). All data lives in the sheet;
+   this page only caches what the signed-in user needs.
+   ===================================================================== */
+const APP_VERSION = 'v8.1';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzx5AGGXWe6--hiOmdi9qwJOfDnRBWI-vxT0WyV3MFFX-_eCB3UILQtRsbDBvrtcR4I/exec';
+let GRACE_MIN = 30;           // replaced by Config.grace_minutes from the sheet after sign-in
+
+/* ---- Shifts: defaults only — replaced by the "Shifts" tab after sign-in ---- */
+let SHIFTS = [
+  { id:'DAY',   label:'Day',        start:'07:00', end:'19:00', overlap:false,
+    accepts:[{shift:'NIGHT',offset:-1},{shift:'OV12',offset:-1},{shift:'OV4',offset:-1}], next:{shift:'NIGHT',offset:0} },
+  { id:'NIGHT', label:'Night',      start:'19:00', end:'07:00', overlap:false,
+    accepts:[{shift:'DAY',offset:0}], next:{shift:'DAY',offset:1} },
+  { id:'OV12',  label:'Overlap 12', start:'12:00', end:'00:00', overlap:true,  accepts:[], next:{shift:'DAY',offset:1} },
+  { id:'OV4',   label:'Overlap 4',  start:'16:00', end:'04:00', overlap:true,  accepts:[], next:{shift:'DAY',offset:1} },
+];
+const ROLES = { CT:'Call Taker', RC:'Response Coordinator', SUP:'Supervisor', ADMIN:'Admin' };
+const FIELDS = {
+  CT:  [ {k:'cases',l:'Total cases'}, {k:'activated',l:'Cases activated to Response'}, {k:'pending',l:'Pending cases'}, {k:'needAct',l:'Cases needing activation'} ],
+  RC:  [ {k:'fromCT',l:'Cases received from Call Taker'}, {k:'during',l:'Cases during the shift'}, {k:'unitsReady',l:'Units ready and available'}, {k:'unitsBusy',l:'Units busy outside'} ],
+  SUP: [],   // the supervisor handover carries no numbers — confirmations + summary only
+};
+/* the four confirmations from the paper Supervisor-to-Supervisor form (step 4) */
+const CONFIRMS = [
+  {k:'pending',    l:'All team members have nothing pending that was not handed over'},
+  {k:'reviewed',   l:'Call Taker and Response handovers were reviewed'},
+  {k:'smartsheet', l:'Smart Sheet is complete, updated and nothing is missing'},
+  {k:'explained',  l:'Important cases and problems were explained to the receiving supervisor'},
+];
+/* the Daily Report — five 24h numbers, once per day, for the manager (not part of the handover) */
+const DAILY_FIELDS = [ {k:'totalCalls',l:'Total Calls'}, {k:'serviceLevel',l:'Service Level'}, {k:'abandoned',l:'Abandoned'}, {k:'callDuration',l:'Call Duration',text:true}, {k:'pickup',l:'Pick up time of calls',text:true} ];
+const EVAL_CATS = [
+  {k:'c1', en:'Communication professionalism', ar:'الاحترافية في التواصل'},
+  {k:'c2', en:'Attendance commitment',          ar:'الالتزام بالحضور'},
+  {k:'c3', en:'Work environment',               ar:'بيئة العمل'},
+  {k:'c4', en:'Data entry quality',             ar:'جودة إدخال البيانات'},
+  {k:'c5', en:'Periodic meetings',              ar:'الاجتماعات الدورية'},
+];
+const SCALE = {1:'Below average',2:'Average',3:'Excellent',4:'Perfect',5:'Beyond job description'};
+/* supervisor evaluation (admin only) — nine categories from the supervisors' sheet */
+const SUP_EVAL_CATS = [
+  {k:'s1', en:'Daily evaluation',        ar:'التقييم اليومي'},
+  {k:'s2', en:'Attendance commitment',   ar:'الالتزام بالحضور'},
+  {k:'s3', en:'Guidance',                ar:'التوجيه'},
+  {k:'s4', en:'Training new staff',      ar:'تدريب الجدد'},
+  {k:'s5', en:'Call reports',            ar:'تقارير المكالمات'},
+  {k:'s6', en:'Technical tickets',       ar:'التذاكر التقنية'},
+  {k:'s7', en:'Challenges',              ar:'التحديات'},
+  {k:'s8', en:'Escalation',              ar:'التصعيد'},
+  {k:'s9', en:'Justifying the numbers',  ar:'تبرير الأرقام'},
+];
+const TICKET_STATUS = ['Open','Closed','No ticket'];
+
+/* ---- helpers ---- */
+const $ = s => document.querySelector(s);
+const h = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const shiftOf = id => SHIFTS.find(s=>s.id===id);
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function dateKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }         // local, never toISOString
+function parseKey(k){ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
+function addDays(k,n){ const d=parseKey(k); d.setDate(d.getDate()+n); return dateKey(d); }
+function fmtDate(k){ const [y,m,d]=k.split('-'); return d+'/'+m+'/'+y; }
+function fmtTime(iso){ const d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fmtDT(iso){ const d=new Date(iso); return fmtDate(dateKey(d))+' '+fmtTime(iso); }
+function mins(t){ const [hh,mm]=t.split(':').map(Number); return hh*60+mm; }
+function crosses(s){ return mins(s.end) <= mins(s.start); }
+function shiftWindow(s, key){
+  const st = parseKey(key); st.setHours(...s.start.split(':').map(Number),0,0);
+  const en = parseKey(crosses(s)?addDays(key,1):key); en.setHours(...s.end.split(':').map(Number),0,0);
+  return {start:st, end:en};
+}
+/* the "shift date" = the date the shift started. Night 19:00 13/09 submitted 07:10 14/09 → 13/09 */
+function currentShiftDate(s, now){
+  const t = now.getHours()*60+now.getMinutes();
+  if (crosses(s) && t < mins(s.end)+GRACE_MIN) return addDays(dateKey(now),-1);
+  return dateKey(now);
+}
+function isOnTime(s, key, iso){ const w=shiftWindow(s,key); return new Date(iso).getTime() <= w.end.getTime()+GRACE_MIN*60000; }
+function suggestShift(now){
+  for (const s of SHIFTS.filter(x=>!x.overlap)){
+    const w=shiftWindow(s, currentShiftDate(s,now));
+    if (now>=w.start && now.getTime()<=w.end.getTime()+GRACE_MIN*60000) return s.id;
+  }
+  return 'DAY';
+}
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove('show'),2200); }
+function sum(arr,k){ return arr.reduce((a,r)=>a+(Number(r.data&&r.data[k])||0),0); }
+
+/* ---- data: in-memory cache filled from the Apps Script backend ---- */
+const DB = { d:{ users:[], reports:[], rosters:[], evals:[], daily:[], tickets:[], supEvals:[] } };
+let BUSY=false;
+function setBusy(b){ BUSY=b; document.body.classList.toggle('busy',b); }
+async function api(action, payload){
+  const body=Object.assign({action}, S.user?{username:S.user.u, token:S.token}:{}, (S.user&&S.user.isSuper&&S.viewRole)?{asRole:S.viewRole}:{}, payload||{});
+  const res=await fetch(API_URL,{method:'POST', body:JSON.stringify(body), redirect:'follow'});
+  let j; try{ j=await res.json(); }catch(e){ throw new Error('Server did not answer as expected — check the deployment access is set to "Anyone".'); }
+  if(!j.ok) throw new Error(j.error||'Request failed');
+  return j;
+}
+function applyConfig(j){
+  if(j.shifts&&j.shifts.length) SHIFTS=j.shifts;
+  if(j.config&&j.config.grace_minutes) GRACE_MIN=Number(j.config.grace_minutes)||30;
+}
+/* reload everything this role needs (called after sign-in, after every write, on refresh) */
+function applyData(j){                    // the server sends the fresh data with every answer
+  applyConfig(j);
+  DB.d = { users:j.users||[], reports:j.reports||[], rosters:j.rosters||[], evals:j.evals||[], daily:j.daily||[], tickets:j.tickets||[], supEvals:j.supEvals||[], accepts:j.accepts||[] };
+  DB.today = j.today || dateKey(new Date());   // the sheet's date (Riyadh), not the phone's
+  DB.at = new Date();
+}
+async function reload(){                   // only for Refresh / coming back to the tab
+  if(!S.user) return;
+  setBusy(true);
+  try{ applyData(curRole()==='ADMIN' ? await api('admin',{days:60}) : await api('bootstrap',{days:3})); }
+  catch(e){ toast(e.message); }
+  finally{ setBusy(false); render(); }
+}
+async function write(action, payload, okMsg){   // one trip: the write's answer already carries the fresh data
+  setBusy(true);
+  try{ const j=await api(action,payload); if(j.data) applyData(j.data); toast(okMsg||'Saved'); setBusy(false); render(); return true; }
+  catch(e){ toast(e.message); setBusy(false); render(); return false; }
+}
+
+/* ---- session ---- */
+const S = { user:null, token:null, mustChange:false, shift:null, shiftDate:null, supView:'home', dailyDate:null, adminTab:'home', viewRole:null, rolePicked:false, chainDate:null, tFilter:'all', from:null, to:null, evalWho:'staff', supEval:{name:'',shift:'',date:''}, resetName:null };   // supView: home | daily | menu | prev | roster | handover
+function loadSession(){ try{ const j=JSON.parse(localStorage.getItem('tec_sess')); if(j){ Object.assign(S,j); } }catch(e){} }
+function curRole(){ return (S.user&&S.user.isSuper&&S.viewRole)||(S.user&&S.user.role); }   // admin "view as" another role
+function saveSession(){ try{ localStorage.setItem('tec_sess', JSON.stringify({user:S.user,token:S.token,mustChange:S.mustChange,shift:S.shift,shiftDate:S.shiftDate,supView:S.supView,adminTab:S.adminTab,viewRole:S.viewRole,rolePicked:S.rolePicked})); }catch(e){} }
+
+/* ---- queries ---- */
+const R = () => DB.d.reports;
+function prevReports(role, shiftId, key){
+  const s=shiftOf(shiftId); const out=[];
+  for (const a of s.accepts){ const k=addDays(key,a.offset); out.push(...R().filter(r=>r.role===role && r.shift===a.shift && r.shiftDate===k)); }
+  return out.sort((a,b)=>a.submittedAt.localeCompare(b.submittedAt));
+}
+/* late reports are not part of the handover: not offered for acceptance, marked "Late — not seen" */
+function splitPrev(role, shiftId, key){ const all=prevReports(role,shiftId,key); return {ok:all.filter(r=>r.onTime), late:all.filter(r=>!r.onTime)}; }
+/* what a given user accepted for a given shift — derived, never duplicated */
+function acceptedPrevBy(u, role, shiftId, key){ return prevReports(role,shiftId,key).filter(r=>r.accepts.some(a=>a.u===u)).map(r=>({r, at:r.accepts.find(a=>a.u===u).at})); }
+function acksOf(r){ return r.acks||[]; }
+function ackedBy(r,u){ return acksOf(r).some(a=>a.u===u); }
+function statusOf(r){ if(r.onTime) return {cls:'ok',txt:'On time'}; return acksOf(r).length? {cls:'late',txt:'Late — acknowledged'} : {cls:'late',txt:'Late — not seen'}; }
+/* "Night 16/09/2026 (Mohannad Awaji, Ragad) total 11/10/2/0 at 07:12" */
+function acceptedFromLine(u, role, shiftId, key){
+  const ap=acceptedPrevBy(u,role,shiftId,key); if(!ap.length) return '';
+  const nf=FIELDS[role].filter(x=>!x.text); const tot=nf.map(x=>sum(ap.map(a=>a.r),x.k)).join('/');
+  const at=ap.map(a=>a.at).sort().pop(); const g={};
+  ap.forEach(a=>{ const k=shiftOf(a.r.shift).label+' '+fmtDate(a.r.shiftDate); (g[k]=g[k]||[]).push(a.r.name); });
+  return Object.keys(g).map(k=>k+' ('+g[k].map(h).join(', ')+')').join(' + ')+(nf.length?' · total '+tot:'')+' · at '+fmtTime(at);
+}
+function myReport(){ return R().find(r=>r.u===S.user.u && r.shift===S.shift && r.shiftDate===S.shiftDate); }
+function rosterFor(shiftId,key){ return DB.d.rosters.find(r=>r.shift===shiftId && r.shiftDate===key); }
+function expectedAcceptors(rep){
+  const s=shiftOf(rep.shift); const n=s.next; const ro=rosterFor(n.shift, addDays(rep.shiftDate,n.offset));
+  if(!ro) return null;
+  return ro.members.filter(m=>m.role===rep.role && m.shift===n.shift).map(m=>m.name);
+}
+function acceptedBy(rep,u){ return rep.accepts.some(a=>a.u===u); }
+function comparison(shiftId,key){
+  const ct = R().filter(r=>r.role==='CT'&&r.shift===shiftId&&r.shiftDate===key);
+  const rc = R().filter(r=>r.role==='RC'&&r.shift===shiftId&&r.shiftDate===key);
+  const ov = R().filter(r=>r.role==='CT'&&shiftOf(r.shift).overlap&&r.shiftDate===key);
+  const ctSum=sum(ct,'activated'), rcSum=sum(rc,'fromCT');
+  return {ct,rc,ov,ctSum,rcSum, flag: ct.length&&rc.length&&ctSum!==rcSum};
+}
+
+/* ---- render ---- */
+function render(){
+  const app=$('#app');
+  if(!S.user){ app.innerHTML=viewSignIn(); return; }
+  if(S.mustChange){ app.innerHTML=viewChangePassword(); return; }
+  if(!DB.at){ app.innerHTML=viewAppBar()+'<div class="wrap"><div class="card"><span class="muted">Loading…</span></div></div>'; return; }
+  if(S.user.isSuper && !S.rolePicked){ app.innerHTML=viewAppBar()+'<div class="wrap">'+viewRolePick()+'</div>'; return; }
+  if(curRole()==='SUP' && (S.supView==='home'||S.supView==='daily')){ app.innerHTML=viewAppBar()+'<div class="wrap">'+(S.supView==='home'?viewSupHome():viewDaily())+'</div>'; return; }
+  if(curRole()!=='ADMIN' && !S.shift){ app.innerHTML=viewAppBar()+'<div class="wrap">'+viewShiftPick()+'</div>'; return; }
+  let body='';
+  if(curRole()==='CT'||curRole()==='RC') body=viewStaff();
+  else if(curRole()==='SUP') body=viewSup();
+  else body=viewAdmin();
+  app.innerHTML=viewAppBar()+'<div class="wrap">'+body+'</div>';
+}
+function logoSvg(cls,color){ return '<svg class="'+cls+'" style="color:'+color+'"><use href="#ma-logo"/></svg>'; }
+
+/* sign in: pick your name from the staff list (search), then password — no typing names */
+const PICK = { open:false, q:'', name:null, empId:'' };
+let STAFF = []; try{ STAFF = JSON.parse(localStorage.getItem('tec_staff')||'[]'); }catch(e){}
+async function loadStaff(){
+  try{ const j=await api('staff'); STAFF=j.staff||[]; STAFF._asked=true; try{ localStorage.setItem('tec_staff',JSON.stringify(STAFF)); }catch(e){} if(!S.user) render(); }
+  catch(e){ if(!STAFF.length) toast(e.message); }
+}
+function viewSignIn(){
+  if(!STAFF._asked){ STAFF._asked=true; loadStaff(); }   // cached list shows at once, fresh list replaces it
+  const q=PICK.q.trim().toLowerCase();
+  const list=STAFF.filter(x=>!q||String(x.name).toLowerCase().includes(q)||String(x.empId||'').toLowerCase().includes(q));
+  let html='<div class="wrap"><div class="signin">'+logoSvg('mark','var(--green)')+
+  '<h1>Shift Endorsement</h1><p>TEC — Emergency Communication Center</p>'+
+  '<div id="f-login"><div class="f"><label class="l">Sign in to continue</label>';
+  if(PICK.name) html+='<button type="button" class="pick on" data-act="pick-name"><span>'+h(PICK.name)+'</span><span class="muted">'+h(PICK.empId||'')+' ▾</span></button>';
+  else html+='<button type="button" class="pick" data-act="pick-name"><span class="muted">Pick your name</span><span class="muted">▾</span></button>';
+  if(PICK.open) html+='<div class="picker"><input class="fld" id="staff-q" placeholder="Search staff" value="'+h(PICK.q)+'" autocomplete="off"><div class="plist">'+
+    (STAFF.length? (list.length? list.map(x=>'<button type="button" class="prow" data-act="choose-name" data-name="'+h(x.name)+'" data-emp="'+h(x.empId||'')+'"><span>'+h(x.name)+'</span><span class="muted mono">'+h(x.empId||'')+'</span></button>').join('') : '<div class="muted" style="padding:10px 12px">No match</div>') : '<div class="muted" style="padding:10px 12px">Loading staff list…</div>')+'</div></div>';
+  html+='</div>';
+  if(PICK.name && !PICK.open) html+='<div class="f"><label class="l">Password</label><input class="fld" id="in-p" type="password" name="p" autocomplete="current-password" data-enter="login"></div>'+
+    '<button class="btn" type="button" data-act="login">Sign In</button>';
+  html+='</div><p class="muted" style="margin:18px 0 0">by MA Solution · '+APP_VERSION+'</p></div></div>';
+  return html;
+}
+function viewChangePassword(){
+  return '<div class="wrap"><div class="signin">'+logoSvg('mark','var(--green)')+
+  '<h1>Set your password</h1><p>First sign-in for '+h(S.user.name)+' — choose a new password.</p>'+
+  '<div class="f"><label class="l">New password</label><input class="fld" id="np1" type="password" autocomplete="new-password" data-enter="chpw"></div>'+
+  '<div class="f"><label class="l">Repeat</label><input class="fld" id="np2" type="password" autocomplete="new-password" data-enter="chpw"></div>'+
+  '<button class="btn" type="button" data-act="chpw">Save password</button>'+
+  '<button class="btn o" type="button" style="margin-top:8px" data-act="logout">Cancel</button></div></div>';
+}
+function viewAppBar(){
+  const s=S.shift?shiftOf(S.shift):null;
+  return '<div class="appbar">'+logoSvg('logo','var(--cream)')+'<span class="t">Shift Endorsement</span>'+
+  '<span class="sp">'+h(S.user.name)+' · '+ROLES[curRole()]+(S.user.isSuper&&S.rolePicked?' <button class="lnk" data-act="switch-role" title="Choose another role to view">Switch role</button>':'')+(s?' · '+h(s.label)+' '+fmtDate(S.shiftDate)+' <button class="lnk" data-act="change-shift">Change</button>':'')+
+  ' <button class="lnk" data-act="refresh" title="Reload from the sheet">Refresh'+(DB.at?' · '+pad(DB.at.getHours())+':'+pad(DB.at.getMinutes()):'')+'</button>'+
+  ' <button class="lnk" data-act="logout">Sign out</button></span></div>';
+}
+function viewShiftPick(){
+  const now=new Date(); const sug=suggestShift(now);
+  return '<div class="card"><h2 class="sec">Which shift are you on?</h2><div class="chips">'+
+  SHIFTS.map(s=>'<button class="chip'+(s.id===sug?' on':'')+'" data-act="pick-shift" data-id="'+s.id+'">'+h(s.label)+'<small>'+s.start+' – '+s.end+'</small></button>').join('')+
+  '</div><p class="muted" style="margin:12px 0 0">Suggested from the current time. Shift names and hours come from the Setup tab of the sheet.</p></div>';
+}
+
+/* ---- CT / RC page ---- */
+function reportCard(r, opts){
+  opts=opts||{}; const s=shiftOf(r.shift); const f=FIELDS[r.role];
+  const exp=opts.showWaiting? expectedAcceptors(r) : null;
+  const accepted=r.accepts.map(a=>h(a.name)+' '+fmtTime(a.at)+(a.note?' <span class="muted">— '+h(a.note)+'</span>':'')).join(' · ');
+  const acked=acksOf(r).map(a=>h(a.name)+' '+fmtTime(a.at)+(a.note?' <span class="muted">— '+h(a.note)+'</span>':'')).join(' · ');
+  const waiting = exp? exp.filter(n=>!r.accepts.some(a=>a.name===n)) : null;
+  const mine = S.user && ackedBy(r,S.user.u);
+  const st=statusOf(r);
+  let html='<div class="card'+(opts.hl&&!mine?' hl':'')+'">';
+  html+='<div class="row" style="margin-bottom:10px"><strong>'+h(r.name)+'</strong><span class="muted">'+h(s.label)+' · '+fmtDate(r.shiftDate)+' · submitted '+fmtTime(r.submittedAt)+'</span>'+
+        '<span class="pill '+st.cls+'">'+st.txt+'</span></div>';
+  if(f.length) html+='<div class="kv">'+f.map(x=>'<div><div class="k">'+h(x.l)+'</div><div class="v'+(x.text?' txt':'')+'">'+h(r.data[x.k])+'</div></div>').join('')+'</div>';
+  if(r.confirms) html+=confirmsTable(r.confirms)+ticketsTable(ticketsOf(r));
+  if(r.problems&&r.problems.length) html+='<div class="tw" style="margin-top:10px"><table><thead><tr><th>Problem</th><th>Action taken or required</th></tr></thead><tbody>'+
+     r.problems.map(p=>'<tr><td>'+h(p.problem)+'</td><td>'+h(p.action)+'</td></tr>').join('')+'</tbody></table></div>';
+  if(r.notes) html+='<div style="margin-top:10px;padding:9px 11px;background:var(--panel);border:1px solid var(--line);border-radius:8px">'+h(r.notes)+'</div>';
+  if(!r.onTime){
+    html+='<div class="muted" style="margin-top:10px;color:var(--red)">Late submission — not part of the handover total.'+(acked?' Acknowledged by: '+acked:' Not acknowledged yet.')+'</div>';
+    if(opts.ackable && !mine) html+='<div class="row" style="margin-top:12px"><input class="fld grow" placeholder="Note (optional)" data-note="'+r.id+'"><button class="btn o sm" data-act="ack" data-id="'+r.id+'">Acknowledge</button></div>';
+    else if(opts.ackable && mine) html+='<div class="okbox" style="margin:10px 0 0">You acknowledged this at '+fmtTime(acksOf(r).find(a=>a.u===S.user.u).at)+'.</div>';
+  } else {
+    html+='<div class="muted" style="margin-top:10px">Accepted by: '+(accepted||'—')+
+        (waiting? (waiting.length?' &nbsp;·&nbsp; <span style="color:var(--pend)">Waiting: '+waiting.map(h).join(', ')+'</span>':' &nbsp;·&nbsp; <span style="color:var(--ok)">All accepted</span>') : '')+'</div>';
+  }
+  const af=acceptedFromLine(r.u, r.role, r.shift, r.shiftDate);
+  if(af) html+='<div class="muted" style="margin-top:6px">Accepted from previous shift: '+af+'</div>';
+  return html+'</div>';
+}
+/* the four confirmations of a submitted supervisor report */
+function confirmsTable(c){
+  return '<div class="tw" style="margin-top:10px"><table><thead><tr><th>Confirmation</th><th style="width:90px">Status</th><th>Note</th></tr></thead><tbody>'+
+    CONFIRMS.map(x=>{const v=c[x.k]||{}; return '<tr><td>'+h(x.l)+'</td><td><span class="pill '+(v.done?'ok':'late')+'">'+(v.done?'Done':'No')+'</span></td><td class="muted">'+h(v.note||'')+'</td></tr>';}).join('')+'</tbody></table></div>';
+}
+function ticketsOf(r){ return DB.d.tickets.filter(t=>t.reportId===r.id); }
+function ticketsTable(list){
+  if(!list.length) return '<div class="muted" style="margin-top:8px">0 abandoned · no tickets.</div>';
+  return '<div class="tw" style="margin-top:10px"><table><thead><tr><th>Type</th><th>Aband justification / reason</th><th>Ticket</th><th>Status</th></tr></thead><tbody>'+
+    list.map(t=>'<tr><td>'+h(t.type)+'</td><td>'+h(t.reason)+'</td><td class="mono">'+h(t.ticketNo||'—')+'</td><td>'+ticketPill(t.status)+'</td></tr>').join('')+'</tbody></table></div>'+
+    '<div class="muted" style="margin-top:6px">Abandoned: <b class="mono">'+list.filter(t=>t.type==='Abandoned').length+'</b> · tickets open <b class="mono">'+list.filter(t=>t.status==='Open').length+'</b></div>';
+}
+function ticketPill(st){ return st==='Open'?'<span class="pill pend">Open</span>':st==='Closed'?'<span class="pill ok">Closed</span>':'<span class="muted">No ticket</span>'; }
+/* previous shift as ONE card: total + one line per person + their problems + one Accept */
+function handoverCard(prev, role, opts){
+  const f=FIELDS[role].filter(x=>!x.text); const u=S.user.u;
+  const pending=prev.filter(r=>!acceptedBy(r,u)); const done=prev.filter(r=>acceptedBy(r,u));
+  let html='<div class="card'+(pending.length?' hl':'')+'"><div class="row" style="margin-bottom:10px"><strong>'+(f.length?'Total · ':'')+prev.length+' report'+(prev.length>1?'s':'')+'</strong>'+
+    (pending.length?'<span class="pill pend">Waiting for your accept</span>':'<span class="pill ok">Accepted</span>')+'</div>';
+  if(f.length) html+='<div class="kv">'+f.map(x=>'<div><div class="k">'+h(x.l)+'</div><div class="v">'+sum(prev,x.k)+'</div></div>').join('')+'</div>';
+  if(role==='SUP'){
+    /* supervisor: the four confirmations in full + the shift summary, per report */
+    prev.forEach(r=>{
+      html+='<div style="margin-top:12px"><div class="row"><strong>'+h(r.name)+'</strong><span class="muted">'+h(shiftOf(r.shift).label)+' · submitted '+fmtTime(r.submittedAt)+(r.accepts.length?' · accepted by '+r.accepts.map(a=>h(a.name)).join(', '):'')+'</span></div>'+confirmsTable(r.confirms||{})+
+        (r.notes?'<div style="margin-top:10px;padding:9px 11px;background:var(--panel);border:1px solid var(--line);border-radius:8px"><span class="muted">Shift summary: </span>'+h(r.notes)+'</div>':'<div class="muted" style="margin-top:8px">No summary written.</div>')+
+        ticketsOf(r).filter(t=>t.status==='Open').map(t=>'<div class="row" style="margin-top:8px"><span class="pill pend">Open ticket</span><span><b class="mono">'+h(t.ticketNo||'—')+'</b> — '+h(t.reason)+' ('+h(t.type)+') — '+h(r.name)+'</span></div>').join('')+'</div>';
+    });
+  } else {
+  html+='<div class="tw" style="margin-top:12px"><table><thead><tr><th>Name</th>'+f.map(x=>'<th style="text-align:center">'+h(x.l).replace('Cases ','').replace(' cases','')+'</th>').join('')+'<th>Submitted</th></tr></thead><tbody>'+
+    prev.map(r=>'<tr><td><strong>'+h(r.name)+'</strong><div class="muted">'+h(shiftOf(r.shift).label)+'</div></td>'+f.map(x=>'<td class="mono" style="text-align:center">'+h(r.data[x.k])+'</td>').join('')+'<td class="muted">'+fmtTime(r.submittedAt)+(r.accepts.length?'<br>accepted by '+r.accepts.map(a=>h(a.name)).join(', '):'')+'</td></tr>').join('')+'</tbody></table></div>';
+  const probs=prev.flatMap(r=>(r.problems||[]).filter(p=>p.problem||p.action).map(p=>({who:r.name,p})).concat(r.notes?[{who:r.name,p:{problem:r.notes,action:''}}]:[]));
+  if(probs.length) html+='<div class="tw" style="margin-top:10px"><table><thead><tr><th>From</th><th>Problem / note</th><th>Action taken or required</th></tr></thead><tbody>'+
+    probs.map(x=>'<tr><td>'+h(x.who)+'</td><td>'+h(x.p.problem)+'</td><td>'+h(x.p.action)+'</td></tr>').join('')+'</tbody></table></div>';
+  else html+='<div class="muted" style="margin-top:10px">No problems reported.</div>';
+  }
+  if(pending.length) html+='<div class="row" style="margin-top:14px"><input class="fld grow" id="accept-note" placeholder="Note (optional) — if something is unclear or does not match"><button class="btn g" data-act="accept-all" data-ids="'+pending.map(r=>r.id).join(',')+'" data-role="'+role+'">Accept</button></div>';
+  else html+='<div class="okbox" style="margin:12px 0 0">You accepted this at '+fmtTime(done.map(r=>r.accepts.find(a=>a.u===u).at).sort().pop())+'.</div>';
+  return html+'</div>';
+}
+function viewStaff(){
+  const s=shiftOf(S.shift); const role=curRole(); const f=FIELDS[role];
+  let html='';
+  let pending=[];
+  if(!s.overlap){
+    const {ok:prev, late}=splitPrev(role,S.shift,S.shiftDate);
+    const which=s.accepts.map(a=>shiftOf(a.shift).label+' '+fmtDate(addDays(S.shiftDate,a.offset))).join(', ');
+    html+='<h2 class="sec">Previous shift — accept <small>'+h(which)+'</small></h2>';
+    if(!prev.length) html+='<div class="card"><span class="muted">Nothing submitted on time yet for '+h(which)+'. If it arrives later, press Refresh.</span></div>';
+    else html+=handoverCard(prev, role, {});
+    if(late.length){
+      html+='<h2 class="sec" style="color:var(--red)">Submitted late — not part of this handover <small>read and acknowledge</small></h2>'+late.map(r=>reportCard(r,{ackable:true,hl:true})).join('');
+    }
+    pending = prev.filter(r=>!acceptedBy(r,S.user.u)).concat(late.filter(r=>!ackedBy(r,S.user.u)));
+  } else {
+    html+='<h2 class="sec">Live — Smartsheet</h2><div class="card"><span class="muted">Not connected yet. When the Smartsheet link is added, today\'s case count will show here.</span></div>';
+  }
+  const mine=myReport();
+  html+='<h2 class="sec">My report <small>'+h(s.label)+' · '+fmtDate(S.shiftDate)+'</small></h2>';
+  if(mine){
+    html+='<div class="okbox">Submitted at '+fmtDT(mine.submittedAt)+' · '+(mine.onTime?'on time':'late')+'. It is now locked.</div>'+reportCard(mine,{});
+  } else {
+    html+='<div class="card'+(pending.length?' locked':'')+'">'+(pending.length?'<div class="lockmsg">Accept the previous shift first ('+pending.length+' waiting)</div>':'');
+    const ctRep = role==='RC' ? R().filter(r=>r.role==='CT'&&r.shift===S.shift&&r.shiftDate===S.shiftDate) : [];
+    const ref = x => (role==='RC'&&x.k==='fromCT') ? '<span class="muted">CT handover cases: </span><b class="mono" style="color:var(--green)">'+(ctRep.length?sum(ctRep,'activated'):'—')+'</b>'+(ctRep.length?'':'<div class="muted">no CT report yet — press Refresh later</div>') : '<span class="muted">—</span>';
+    html+='<div class="tw"><table><thead><tr><th>Item</th><th style="width:140px">Count</th><th style="width:190px">Reference</th></tr></thead><tbody>'+
+      f.map(x=>'<tr><td>'+h(x.l)+'</td><td>'+(x.text?'<input class="fld" data-f="'+x.k+'">':'<input class="num" type="number" min="0" inputmode="numeric" data-f="'+x.k+'">')+'</td><td>'+ref(x)+'</td></tr>').join('')+'</tbody></table></div>';
+    if(role==='CT'){
+      html+='<h2 class="sec">Problems faced by the Call Taker, other reasons or notes</h2><div class="tw"><table id="probs"><thead><tr><th style="width:50%">Problem</th><th>Action taken or required</th></tr></thead><tbody>'+
+        '<tr><td><input class="fld" data-p="problem"></td><td><input class="fld" data-p="action"></td></tr><tr><td><input class="fld" data-p="problem"></td><td><input class="fld" data-p="action"></td></tr></tbody></table></div>'+
+        '<button class="btn o sm" style="margin-top:8px" data-act="add-prob">+ Add row</button>';
+    } else {
+      html+='<h2 class="sec">Notes on cases or units, problems or other reasons</h2><textarea class="fld" id="rc-notes" placeholder="Status or action required"></textarea>';
+    }
+    html+='<div class="row" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line)"><button class="btn" data-act="submit-report">Submit report</button>'+
+          '<span class="muted">Submitting locks the report. Your name, shift and time are recorded automatically.</span></div></div>';
+  }
+  return html;
+}
+
+/* ---- Supervisor page: home (2 buttons) → shift → menu (3 buttons) → one page each ---- */
+function big(cls, act, v, title, desc, status, disabled){
+  return '<button class="big '+cls+'" data-act="'+act+'" data-v="'+v+'" data-t="'+v+'"'+(disabled?' disabled':'')+'><span class="t">'+title+'</span><span class="d">'+desc+'</span><span class="st">'+status+'</span></button>';
+}
+function viewRolePick(){
+  return '<h2 class="sec">Continue as <small>choose which side of the app to use. Anything you submit is saved under your name in that role.</small></h2><div class="menu">'+
+    big('warn','pick-role','','Admin','Attention, handover chain, reports, tickets, evaluations, users','Open →')+
+    big('warn','pick-role','CT','Call Taker','The Call Taker pages exactly as staff see them','Open →')+
+    big('warn','pick-role','RC','Response Coordinator','The RC pages exactly as staff see them','Open →')+
+    big('warn','pick-role','SUP','Supervisor','Shift handover and Daily Report as supervisors see them','Open →')+'</div>';
+}
+function viewSupHome(){
+  const today=DB.today||dateKey(new Date()); const d=DB.d.daily.find(x=>x.date===today);
+  return '<div class="menu">'+
+    big('warn','sup-view','menu','Shift handover','Choose your shift, accept the previous shift, roster, hand over.', S.shift?h(shiftOf(S.shift).label)+' '+fmtDate(S.shiftDate)+' →':'Choose shift →')+
+    big(d?'done':'grey','sup-view','daily','Daily Report','Total Calls, Service Level, Abandoned, Call Duration, Pick-up time — once per day.', d?'Today saved by '+h(d.name)+' '+fmtTime(d.at):'Today not filled')+
+    '</div>';
+}
+function supState(){
+  const key=S.shiftDate;
+  const {ok:prev, late:prevLate}=splitPrev('SUP',S.shift,key);
+  const pending=prev.filter(r=>!acceptedBy(r,S.user.u)).concat(prevLate.filter(r=>!ackedBy(r,S.user.u)));
+  return { key, prev, prevLate, pending, roster:rosterFor(S.shift,key), mine:myReport(), s:shiftOf(S.shift),
+           which: shiftOf(S.shift).accepts.map(a=>shiftOf(a.shift).label+' '+fmtDate(addDays(key,a.offset))).join(', ') };
+}
+function viewSup(){
+  const st=supState();
+  const back='<button class="back" data-act="sup-view" data-v="menu">← Back to buttons</button>';
+  const foot='<div style="margin-top:16px">'+back+'</div>';
+  if(S.supView==='prev')     return back+viewSupPrev(st)+foot;
+  if(S.supView==='roster')   return back+'<h2 class="sec">Roster <small>everyone on your shift, overlap staff included — you can come back and add any time</small></h2>'+rosterEditor(st.roster)+foot;
+  if(S.supView==='handover') return back+viewSupHandover(st)+foot;
+  return viewSupMenu(st);
+}
+function viewSupMenu(st){
+  const acceptedAt = st.prev.length&&!st.pending.length ? st.prev.map(r=>(r.accepts.find(a=>a.u===S.user.u)||{}).at).filter(Boolean).sort().pop() : null;
+  const b1 = st.pending.length ? big('grey','sup-view','prev','1 · Previous shift', h(st.which)+(st.prev.length?' — '+st.prev.map(r=>h(r.name)).join(', '):''), st.pending.length+' waiting for your accept')
+           : st.prev.length   ? big('done','sup-view','prev','1 · Previous shift', h(st.which)+' — '+st.prev.map(r=>h(r.name)).join(', '), 'Accepted '+(acceptedAt?fmtTime(acceptedAt):''))
+           :                    big('grey','sup-view','prev','1 · Previous shift', h(st.which), 'Nothing submitted yet');
+  const b2 = st.roster&&st.roster.members.length ? big('done','sup-view','roster','2 · Roster','Names on your shift, overlap included', st.roster.members.length+' people')
+           : big('grey','sup-view','roster','2 · Roster','Names on your shift, overlap included','Not entered');
+  const b3 = st.mine ? big('done','sup-view','handover','3 · Handover','Review reports, evaluate, confirm and hand over','Submitted '+fmtTime(st.mine.submittedAt))
+           : big('grey','sup-view','handover','3 · Handover','Review reports, evaluate, confirm and hand over', st.pending.length?'Accept the previous shift first':'Not submitted', !!st.pending.length);
+  return '<button class="back" data-act="sup-view" data-v="home">← Home</button><div class="menu">'+b1+b2+b3+'</div>';
+}
+function viewSupPrev(st){
+  let html='<h2 class="sec">Previous supervisor — accept <small>'+h(st.which)+'</small></h2>';
+  if(!st.prev.length) html+='<div class="card"><span class="muted">No supervisor report submitted on time for '+h(st.which)+'. If it arrives later, press Refresh.</span></div>';
+  else html+=handoverCard(st.prev,'SUP',{});
+  if(st.prevLate.length) html+='<h2 class="sec" style="color:var(--red)">Submitted late — not part of this handover <small>read and acknowledge</small></h2>'+st.prevLate.map(r=>reportCard(r,{ackable:true,hl:true})).join('');
+  return html;
+}
+function staffOptions(sel){
+  const staff=DB.d.users.filter(u=>u.role==='CT'||u.role==='RC');
+  return '<option value="">— pick name —</option>'+staff.map(u=>'<option value="'+h(u.name)+'" data-role="'+u.role+'"'+(u.name===sel?' selected':'')+'>'+h(u.name)+(u.empId?' · '+h(u.empId):'')+'</option>').join('');
+}
+function rosterRow(m){
+  return '<tr><td><select class="fld" data-r="name">'+staffOptions(m.name)+'</select></td><td><select class="fld" data-r="role">'+
+    ['CT','RC'].map(x=>'<option value="'+x+'"'+(m.role===x?' selected':'')+'>'+ROLES[x]+'</option>').join('')+'</select></td><td><select class="fld" data-r="shift">'+
+    SHIFTS.map(x=>'<option value="'+x.id+'"'+(m.shift===x.id?' selected':'')+'>'+h(x.label)+'</option>').join('')+'</select></td><td><button class="btn o sm" data-act="del-row" title="Remove">×</button></td></tr>';
+}
+function rosterEditor(roster){
+  const members=(roster?roster.members:[]).concat([{name:'',role:'CT',shift:S.shift}]);
+  let html='<div class="card"><div class="tw"><table id="roster"><thead><tr><th>Name</th><th style="width:190px">Role</th><th style="width:150px">Shift</th><th style="width:40px"></th></tr></thead><tbody>'+
+    members.map(rosterRow).join('')+
+    '</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn o sm" data-act="add-roster">+ Add person</button><span class="grow"></span><button class="btn" data-act="save-roster">Save roster</button></div>'+
+    (roster?'<div class="okbox" style="margin:10px 0 0">Roster saved · '+roster.members.length+' people.</div>':'')+'</div>';
+  return html;
+}
+function viewSupHandover(st){
+  const key=st.key, s=st.s, roster=st.roster;
+  let html='';
+  /* what I accepted */
+  html+='<h2 class="sec">What I accepted <small>from the previous supervisor · '+h(st.which)+'</small></h2>';
+  const acc=st.prev.filter(r=>acceptedBy(r,S.user.u));
+  html+= acc.length ? acc.map(r=>reportCard(r,{})).join('') : '<div class="card"><span class="muted">Nothing accepted yet.</span></div>';
+  /* roster, editable here too */
+  html+='<h2 class="sec">My roster <small>'+h(s.label)+' '+fmtDate(key)+(roster?' · '+roster.members.length+' people':'')+' — add or delete here as well</small></h2>'+rosterEditor(roster);
+  /* comparison */
+  const c=comparison(S.shift,key);
+  html+='<h2 class="sec">CT ↔ RC comparison</h2><div class="card">';
+  html+= c.flag ? '<div class="flag">Mismatch: Call Takers report <b>'+c.ctSum+'</b> cases activated to Response, the Response Coordinator reports <b>'+c.rcSum+'</b> received. Flagged for review — nothing changed.</div>'
+       : (c.ct.length&&c.rc.length ? '<div class="okbox">Call Takers activated '+c.ctSum+' · Response received '+c.rcSum+' — match.</div>' : '<div class="muted" style="margin-bottom:8px">Comparison appears once both CT and RC reports for this shift are in.</div>');
+  html+='<div class="kv"><div><div class="k">CT activated ('+h(s.label)+')</div><div class="v">'+c.ctSum+'</div><div class="muted">'+(c.ct.map(r=>h(r.name)+' '+r.data.activated).join(' · ')||'—')+'</div></div>'+
+        '<div><div class="k">RC received from CT</div><div class="v">'+c.rcSum+'</div><div class="muted">'+(c.rc.map(r=>h(r.name)).join(' · ')||'—')+'</div></div>'+
+        '<div><div class="k">Overlap CT activated (separate)</div><div class="v">'+sum(c.ov,'activated')+'</div><div class="muted">'+(c.ov.map(r=>h(r.name)+' ('+shiftOf(r.shift).label+') '+r.data.activated).join(' · ')||'—')+'</div></div></div></div>';
+  /* reports */
+  html+='<h2 class="sec">Reports this shift</h2>';
+  const reps=c.ct.concat(c.rc,c.ov);
+  html+= reps.length? reps.map(r=>reportCard(r,{showWaiting:true})).join('') : '<div class="card"><span class="muted">No CT or RC reports submitted yet for this shift.</span></div>';
+  /* roster names with no report */
+  if(roster&&roster.members.length){
+    const missing=roster.members.filter(m=>!R().some(r=>r.role===m.role&&r.name===m.name&&r.shift===m.shift&&r.shiftDate===key));
+    html+='<h2 class="sec">No report submitted <small>people on your roster with no report for this shift</small></h2>';
+    html+= missing.length ? '<div class="card"><div class="row">'+missing.map(m=>'<span class="pill late">'+h(m.name)+' · '+ROLES[m.role]+' · '+h(shiftOf(m.shift).label)+'</span>').join('')+'</div><div class="muted" style="margin-top:8px">Press Refresh after they submit.</div></div>'
+                         : '<div class="okbox">Everyone on the roster has submitted.</div>';
+  }
+  /* evaluation */
+  html+='<h2 class="sec">Evaluation <small>1 Below average · 2 Average · 3 Excellent · 4 Perfect · 5 Beyond job description</small></h2>';
+  if(!roster||!roster.members.length) html+='<div class="card"><span class="muted">Save the roster above to evaluate your staff.</span></div>';
+  else html+=roster.members.map(m=>{
+    const ev=DB.d.evals.find(e=>e.shift===S.shift&&e.shiftDate===key&&e.employee===m.name)||{scores:{},notes:''};
+    return '<div class="card" data-emp="'+h(m.name)+'"><div class="row" style="margin-bottom:10px"><strong>'+h(m.name)+'</strong><span class="muted">'+ROLES[m.role]+' · '+h(shiftOf(m.shift).label)+'</span>'+(ev.id?'<span class="pill ok">Saved</span>':'')+'</div><div class="eval">'+
+      EVAL_CATS.map(cat=>'<div>'+h(cat.en)+'<div class="ar">'+h(cat.ar)+'</div></div><div class="scale" data-cat="'+cat.k+'">'+[1,2,3,4,5].map(n=>'<button type="button" class="'+(ev.scores[cat.k]===n?'on':'')+'" data-act="score" data-n="'+n+'" title="'+SCALE[n]+'">'+n+'</button>').join('')+'</div>').join('')+
+      '</div><input class="fld" style="margin-top:10px" data-ev="notes" placeholder="Notes" value="'+h(ev.notes)+'"><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn sm" data-act="save-eval" data-emp="'+h(m.name)+'">Save evaluation</button></div></div>';
+  }).join('');
+  /* confirmations + summary + submit */
+  html+='<h2 class="sec">Shift endorsement <small>'+h(s.label)+' · '+fmtDate(key)+'</small></h2>';
+  if(st.mine) html+='<div class="okbox">Submitted at '+fmtDT(st.mine.submittedAt)+' · '+(st.mine.onTime?'on time':'late')+'. Locked.</div>'+reportCard(st.mine,{});
+  else html+='<div class="card'+(st.pending.length?' locked':'')+'">'+(st.pending.length?'<div class="lockmsg">Accept the previous supervisor first</div>':'')+
+    '<h2 class="sec">Abandoned calls &amp; tickets <small>one row per abandoned case · one row per other issue · leave empty if none</small></h2>'+
+    '<div class="tw"><table id="tickets"><thead><tr><th style="width:130px">Type</th><th>Aband justification / reason of ticket</th><th style="width:130px">Ticket number</th><th style="width:130px">Ticket status</th><th style="width:40px"></th></tr></thead><tbody></tbody></table></div>'+
+    '<div class="row" style="margin-top:10px"><button type="button" class="btn o sm" data-act="add-ticket" data-type="Abandoned">+ Add abandoned case</button><button type="button" class="btn o sm" data-act="add-ticket" data-type="Other">+ Add other issue</button><span class="muted" style="margin-left:auto">Abandoned this shift: <b class="mono" id="aband-n">0</b></span></div>'+
+    '<h2 class="sec">Confirmation before shift endorsement</h2>'+
+    '<div class="tw"><table id="confirms"><thead><tr><th>Confirmation</th><th style="width:150px">Status</th><th style="width:34%">Note if any</th></tr></thead><tbody>'+
+    CONFIRMS.map(x=>'<tr data-c="'+x.k+'"><td>'+h(x.l)+'</td><td><div class="chips"><button type="button" class="chip" data-act="confirm" data-v="1" style="padding:6px 12px">Done</button><button type="button" class="chip" data-act="confirm" data-v="0" style="padding:6px 12px">No</button></div></td><td><input class="fld" data-cn placeholder="—"></td></tr>').join('')+'</tbody></table></div>'+
+    '<h2 class="sec">Shift summary for the next supervisor</h2><textarea class="fld" id="rc-notes" placeholder="General overview of the shift, anything left for the next shift"></textarea>'+
+    '<div class="row" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line)"><button class="btn" data-act="submit-report">Submit &amp; hand over</button><span class="muted">Locks the handover. The next supervisor will see and accept this.</span></div></div>';
+  return html;
+}
+/* Daily Report — once per date, any signed-in supervisor, locked after save */
+function viewDaily(){
+  const today=DB.today||dateKey(new Date()); const date=S.dailyDate||today;
+  const cur=DB.d.daily.find(d=>d.date===date);
+  let html='<button class="back" data-act="sup-view" data-v="home">← Home</button>';
+  html+='<h2 class="sec">Daily Report <small>the five 24-hour numbers for the manager — once per day, usually filled around 12:00 by the supervisor on duty</small></h2>';
+  html+='<div class="card"><div class="row" style="margin-bottom:12px"><label class="l" style="margin:0">Report date</label><input class="fld" type="date" id="daily-date" value="'+date+'" max="'+today+'" style="width:auto">'+
+    (cur?'<span class="pill ok">Saved · locked</span>':'<span class="pill pend">Not filled yet</span>')+'</div>';
+  if(cur){
+    html+='<div class="kv">'+DAILY_FIELDS.map(x=>'<div><div class="k">'+h(x.l)+'</div><div class="v'+(x.text?' txt':'')+'">'+h(cur.data[x.k])+'</div></div>').join('')+'</div>'+
+      (cur.notes?'<div style="margin-top:10px;padding:9px 11px;background:var(--panel);border:1px solid var(--line);border-radius:8px">'+h(cur.notes)+'</div>':'')+
+      '<div class="muted" style="margin-top:10px">Filled by '+h(cur.name)+' · '+fmtDT(cur.at)+' · locked.</div>';
+  } else {
+    html+='<div class="tw"><table><thead><tr><th>Item</th><th style="width:170px">Value</th></tr></thead><tbody>'+
+      DAILY_FIELDS.map(x=>'<tr><td>'+h(x.l)+'</td><td>'+(x.text?'<input class="fld" data-d="'+x.k+'" placeholder="e.g. 2m 3s">':'<input class="num" type="number" min="0" inputmode="decimal" step="any" data-d="'+x.k+'">')+'</td></tr>').join('')+'</tbody></table></div>'+
+      '<h2 class="sec">Notes</h2><textarea class="fld" id="daily-notes" placeholder="Optional"></textarea>'+
+      '<div class="row" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line)"><button class="btn" data-act="save-daily">Save daily report</button><span class="muted">Saving locks this date. Your name and time are recorded automatically.</span></div>';
+  }
+  html+='</div>';
+  const recent=DB.d.daily.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  html+='<h2 class="sec">Last 14 days</h2>'+tbl(['Date','Filled by'].concat(DAILY_FIELDS.map(x=>x.l),['Notes']), recent.map(d=>[fmtDate(d.date),h(d.name)+'<div class="muted">'+fmtTime(d.at)+'</div>'].concat(DAILY_FIELDS.map(x=>'<span class="mono">'+h(d.data[x.k])+'</span>'),[h(d.notes)])));
+  html+='<div style="margin-top:16px"><button class="back" data-act="sup-view" data-v="home">← Home</button></div>';
+  return html;
+}
+
+/* ---- Admin page ---- */
+function tbl(cols, rows){ return '<div class="tw"><table><thead><tr>'+cols.map(c=>'<th>'+h(c)+'</th>').join('')+'</tr></thead><tbody>'+
+  (rows.length? rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('') : '<tr><td colspan="'+cols.length+'" class="muted">Nothing yet.</td></tr>')+'</tbody></table></div>'; }
+function csv(cols, rows, name){
+  const esc=v=>'"'+String(v).replace(/<[^>]*>/g,'').replace(/"/g,'""')+'"';
+  const txt=[cols.map(esc).join(',')].concat(rows.map(r=>r.map(esc).join(','))).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(txt); a.download=name+'.csv'; a.click();
+}
+let ADMIN_CUR=null;
+const inRange=(d,from,to)=>(!from||d>=from)&&(!to||d<=to);
+function adminRange(){ const today=DB.today||dateKey(new Date()); return { from:S.from||addDays(today,-30), to:S.to||today }; }
+function nameOf(u){ return h((DB.d.users.find(x=>x.u===u)||{}).name||u); }
+/* ---- attention counters ---- */
+function attention(){
+  const today=DB.today||dateKey(new Date()); const wk=addDays(today,-7);
+  const reps=R();
+  const openT=DB.d.tickets.filter(t=>t.status==='Open');
+  const noConf=reps.filter(r=>r.role==='SUP'&&r.shiftDate>=wk&&r.confirms&&CONFIRMS.some(x=>!(r.confirms[x.k]||{}).done));
+  const lateNA=reps.filter(r=>!r.onTime&&!acksOf(r).length);
+  const keys=[...new Set(reps.filter(r=>!shiftOf(r.shift).overlap&&r.shiftDate>=wk).map(r=>r.shift+'|'+r.shiftDate))];
+  const mism=keys.filter(k=>{const [sh,d]=k.split('|'); return comparison(sh,d).flag;});
+  /* shifts with no report: every Day/Night from wk to yesterday, per role CT/RC/SUP */
+  const missing=[]; for(let d=wk; d<today; d=addDays(d,1)) SHIFTS.filter(x=>!x.overlap).forEach(x=>['CT','RC','SUP'].forEach(role=>{ if(!reps.some(r=>r.role===role&&r.shift===x.id&&r.shiftDate===d)) missing.push({shift:x.id,date:d,role}); }));
+  const dailyMiss=[]; for(let d=addDays(today,-3); d<today; d=addDays(d,1)) if(!DB.d.daily.some(x=>x.date===d)) dailyMiss.push(d);
+  return {openT,noConf,lateNA,mism,missing,dailyMiss};
+}
+function viewAttention(){
+  const A=attention();
+  const box=(k,n,t,label)=>'<button class="abox'+(n?' bad':'')+'" data-act="admin-go" data-t="'+t+'" data-k="'+k+'"><div class="k">'+label+'</div><div class="v">'+n+'</div></button>';
+  return '<h2 class="sec">Needs attention <small>live — from all tabs</small></h2><div class="kv" style="margin-bottom:6px">'+
+    box('open',A.openT.length,'tickets','Open tickets')+box('noconf',A.noConf.length,'reports','Confirmations "No" · 7 days')+box('late',A.lateNA.length,'reports','Late, not acknowledged')+
+    box('mism',A.mism.length,'flags','CT ↔ RC mismatch · 7 days')+box('missing',A.missing.length,'missing','Shifts with no report · 7 days')+box('daily',A.dailyMiss.length,'daily','Daily Report missing · 3 days')+'</div>';
+}
+/* ---- handover chain for one date ---- */
+function chainNodes(role, date){
+  const seq=[{shift:'NIGHT',date:addDays(date,-1)},{shift:'DAY',date},{shift:'NIGHT',date},{shift:'DAY',date:addDays(date,1)}].filter(n=>shiftOf(n.shift));
+  const now=new Date();
+  return seq.map(n=>{ const reps=R().filter(r=>r.role===role&&r.shift===n.shift&&r.shiftDate===n.date); const w=shiftWindow(shiftOf(n.shift),n.date);
+    return Object.assign(n,{reps, future: now<w.start, ended: now.getTime()>w.end.getTime()+GRACE_MIN*60000}); });
+}
+function viewChain(){
+  const date=S.chainDate||DB.today||dateKey(new Date());
+  let html='<h2 class="sec">Handover chain <small><button class="lnk2" data-act="chain-day" data-n="-1">◀</button> <input class="fld" type="date" id="chain-date" value="'+date+'" style="padding:4px 8px;width:auto"> <button class="lnk2" data-act="chain-day" data-n="1">▶</button> — who received from who</small></h2><div class="card">';
+  [['SUP','Supervisor'],['CT','Call Takers'],['RC','Response Coordinator']].forEach(([role,label])=>{
+    const nodes=chainNodes(role,date); const f=FIELDS[role].filter(x=>!x.text);
+    html+='<div class="muted" style="margin:6px 0 4px">'+label+'</div><div class="chain">';
+    nodes.forEach((n,i)=>{
+      const late=n.reps.filter(r=>!r.onTime), ok=n.reps.filter(r=>r.onTime);
+      let cls='', sub='';
+      if(n.reps.length){ sub=(f.length?'total '+f.map(x=>sum(ok,x.k)).join('/'):'submitted '+fmtTime(n.reps[0].submittedAt)); const lna=late.filter(r=>!acksOf(r).length); if(lna.length){ cls='bad'; sub+='<br><span style="color:var(--red)">'+lna.map(r=>h(r.name)).join(', ')+' late — not acknowledged</span>'; } else if(late.length) sub+='<br><span style="color:var(--pend)">'+late.map(r=>h(r.name)).join(', ')+' late — acknowledged</span>'; }
+      else if(n.future){ cls='wait'; sub='—'; } else if(n.ended){ cls='bad'; sub='<span style="color:var(--red)">nobody submitted</span>'; } else { cls='wait'; sub='<span style="color:var(--pend)">in progress</span>'; }
+      html+='<div class="node '+cls+'"><b>'+h(shiftOf(n.shift).label)+' '+fmtDate(n.date)+(n.reps.length?' · '+n.reps.map(r=>h(r.name)).join(', '):'')+'</b><span class="muted">'+sub+'</span></div>';
+      if(i<nodes.length-1){ const nx=nodes[i+1];
+        let arrow;
+        if(!ok.length) arrow=n.reps.length?'<span class="arrow bad">nothing to accept</span>':(n.future||!n.ended?'<span class="arrow">→</span>':'<span class="arrow bad">no report →</span>');
+        else { const acc=ok.filter(r=>r.accepts.length); if(acc.length===ok.length){ const names=[...new Set(ok.flatMap(r=>r.accepts.map(a=>a.name)))]; const at=ok.flatMap(r=>r.accepts.map(a=>a.at)).sort().pop(); arrow='<span class="arrow">accepted by '+names.map(h).join(', ')+' '+fmtTime(at)+' →</span>'; }
+          else arrow=nx.future?'<span class="arrow">→</span>':'<span class="arrow bad">not accepted yet</span>'; }
+        html+=arrow; }
+    });
+    html+='</div>';
+  });
+  return html+'</div>';
+}
+/* ---- evaluation averages for a period ---- */
+function evalSummary(who, from, to){
+  const cats=who==='sup'?SUP_EVAL_CATS:EVAL_CATS;
+  const src=who==='sup'? DB.d.supEvals.filter(e=>inRange(e.date,from,to)).map(e=>({name:e.supervisor,scores:e.scores,role:'SUP'}))
+                       : DB.d.evals.filter(e=>inRange(e.shiftDate,from,to)).map(e=>({name:e.employee,scores:e.scores,role:e.role||''}));
+  const by={}; src.forEach(e=>{ const o=by[e.name]=by[e.name]||{name:e.name,role:e.role,n:0,sum:{},cnt:{}}; o.n++; cats.forEach(c=>{ const v=Number(e.scores[c.k]); if(v){ o.sum[c.k]=(o.sum[c.k]||0)+v; o.cnt[c.k]=(o.cnt[c.k]||0)+1; } }); });
+  return Object.values(by).map(o=>{ const avg=cats.map(c=>o.cnt[c.k]?o.sum[c.k]/o.cnt[c.k]:null); const vals=avg.filter(v=>v!==null); return Object.assign(o,{avg, overall: vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : null}); }).sort((a,b)=>a.name.localeCompare(b.name));
+}
+const f1=v=>v===null||v===undefined?'—':(Math.round(v*10)/10).toFixed(1);
+const ADMIN_PAGES=[['chain','Handover chain','Who received from who, day by day'],['reports','Reports','Every CT, RC and supervisor handover'],['tickets','Tickets & Abandoned','Open / closed tickets, abandoned cases'],['roster','Roster & Evaluation','Names per shift with their scores'],['evalsum','Evaluation summary','Averages per person for a period'],['daily','Daily Report','The five daily numbers'],['supeval','Evaluate supervisor','Nine categories, per shift'],['users','Users','Reset passwords, activate / deactivate'],['config','Setup','Shift times and duration (read-only)']];
+function viewAdminHome(){
+  let html='<div class="note"><b>Google Sheet connected</b> · last 60 days · loaded '+(DB.at?fmtDT(DB.at.toISOString()):'—')+'</div>';
+  html+=viewAttention();
+  html+='<h2 class="sec" style="margin-top:22px">Pages</h2><div class="menu">'+ADMIN_PAGES.map(pg=>big('warn','admin-tab',pg[0],pg[1],pg[2],'Open →')).join('')+'</div>';
+  return html;
+}
+function viewAdmin(){
+  if(!S.adminTab||S.adminTab==='home') return viewAdminHome();
+  const pg=ADMIN_PAGES.find(x=>x[0]===S.adminTab)||{1:S.adminTab==='flags'?'CT ↔ RC comparison':S.adminTab==='missing'?'Shifts with no report':S.adminTab};
+  const back='<button class="back" data-act="admin-tab" data-t="home">← Home</button>';
+  let html=back+'<h2 class="sec" style="margin-top:4px">'+h(pg[1])+'</h2>';
+  if(S.adminTab==='chain') return html+viewChain()+'<div style="margin-top:16px">'+back+'</div>';
+  const reps=R().slice().sort((a,b)=>b.submittedAt.localeCompare(a.submittedAt));
+  const {from,to}=adminRange();
+  const rangeBar=()=>'<div class="row" style="margin-bottom:8px"><span class="muted">From</span><input class="fld" type="date" data-range="from" value="'+from+'" style="width:auto"><span class="muted">to</span><input class="fld" type="date" data-range="to" value="'+to+'" style="width:auto"></div>';
+  let cols=[],rows=[],extra='';
+  if(S.adminTab==='reports'){
+    const A=attention(); let list=reps;
+    if(S.tFilter==='noconf') list=A.noConf; else if(S.tFilter==='late') list=A.lateNA;
+    extra='<div class="row" style="margin-bottom:8px">'+[['all','All'],['noconf','Confirmations "No"'],['late','Late, not acknowledged']].map(x=>'<button class="chip'+(S.tFilter===x[0]?' on':'')+'" data-act="tfilter" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>';
+    cols=['Role','Name','Shift','Date','Submitted','Status','Numbers / confirmations','Notes / problems','Accepted by','Accepted from previous shift'];
+    rows=list.map(r=>{const st=statusOf(r);
+      return [ROLES[r.role],h(r.name),shiftOf(r.shift).label,fmtDate(r.shiftDate),fmtDT(r.submittedAt),'<span class="pill '+st.cls+'">'+st.txt+'</span>',
+      r.role==='SUP' ? CONFIRMS.map(x=>{const v=(r.confirms||{})[x.k]||{}; return (v.done?'<span style="color:var(--ok)">Done</span>':'<span style="color:var(--red)">No</span>')+' — '+h(x.l)+(v.note?' <span class="muted">('+h(v.note)+')</span>':'');}).join('<br>') : FIELDS[r.role].map(f=>h(f.l)+': <b>'+h(r.data[f.k])+'</b>').join('<br>'),
+      h(r.notes||'')+(r.problems?r.problems.map(p=>h(p.problem)+' → '+h(p.action)).join('<br>'):''),
+      r.onTime ? (r.accepts.map(a=>h(a.name)+' '+fmtDT(a.at)).join('<br>')||'—') : (acksOf(r).length?'<span style="color:var(--pend)">acknowledged: '+acksOf(r).map(a=>h(a.name)+' '+fmtDT(a.at)).join('<br>')+'</span>':'<span style="color:var(--red)">not seen</span>'),
+      acceptedFromLine(r.u,r.role,r.shift,r.shiftDate)||'—'];});
+  }
+  if(S.adminTab==='flags'){
+    cols=['Shift','Date','CT activated','RC received','Overlap CT (separate)','Status'];
+    const keys=[...new Set(R().filter(r=>!shiftOf(r.shift).overlap).map(r=>r.shift+'|'+r.shiftDate))];
+    rows=keys.map(k=>{const [sh,d]=k.split('|'); const c=comparison(sh,d); return [shiftOf(sh).label,fmtDate(d),c.ctSum,c.rcSum,sum(c.ov,'activated'),
+      c.flag?'<span class="pill late">Mismatch</span>':(c.ct.length&&c.rc.length?'<span class="pill ok">Match</span>':'<span class="pill pend">Incomplete</span>')];}).sort((a,b)=>b[1].localeCompare(a[1]));
+    extra='<h2 class="sec">CT ↔ RC comparison</h2>';
+  }
+  if(S.adminTab==='missing'){
+    const A=attention(); cols=['Date','Shift','Role']; rows=A.missing.map(m=>[fmtDate(m.date),shiftOf(m.shift).label,ROLES[m.role]]);
+    extra='<h2 class="sec">Shifts with no report <small>last 7 days, up to yesterday</small></h2>';
+  }
+  if(S.adminTab==='tickets'){
+    let list=DB.d.tickets.filter(t=>inRange(t.date,from,to));
+    if(S.tFilter==='open') list=list.filter(t=>t.status==='Open'); if(S.tFilter==='closed') list=list.filter(t=>t.status==='Closed');
+    if(S.tFilter==='aband') list=list.filter(t=>t.type==='Abandoned'); if(S.tFilter==='other') list=list.filter(t=>t.type==='Other');
+    extra='<div class="row" style="margin-bottom:8px">'+[['all','All'],['open','Open'],['closed','Closed'],['aband','Abandoned only'],['other','Other only']].map(x=>'<button class="chip'+(S.tFilter===x[0]?' on':'')+'" data-act="tfilter" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+rangeBar();
+    cols=['Date','Shift','Supervisor','Employee ID','Type','Justification / reason','Ticket','Status'];
+    rows=list.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(t=>[fmtDate(t.date),shiftOf(t.shift)?shiftOf(t.shift).label:h(t.shift),h(t.sup),h(t.empId||'—'),h(t.type),h(t.reason),'<span class="mono">'+h(t.ticketNo||'—')+'</span>',ticketPill(t.status)]);
+    const all=DB.d.tickets.filter(t=>inRange(t.date,from,to));
+    extra+='<div class="muted" style="margin-bottom:8px">In period: abandoned <b class="mono">'+all.filter(t=>t.type==='Abandoned').length+'</b> · tickets open <b class="mono">'+all.filter(t=>t.status==='Open').length+'</b> · closed <b class="mono">'+all.filter(t=>t.status==='Closed').length+'</b></div>';
+  }
+  if(S.adminTab==='roster'){
+    cols=['Shift','Date','Supervisor','Name','Role','Member shift'].concat(EVAL_CATS.map(c=>c.ar),['Notes']);
+    rows=DB.d.rosters.filter(r=>inRange(r.shiftDate,from,to)).sort((a,b)=>b.shiftDate.localeCompare(a.shiftDate)).flatMap(r=>r.members.map(m=>{const e=DB.d.evals.find(x=>x.shift===r.shift&&x.shiftDate===r.shiftDate&&x.employee===m.name)||{scores:{},notes:''};
+      return [shiftOf(r.shift).label,fmtDate(r.shiftDate),nameOf(r.sup),h(m.name),ROLES[m.role],shiftOf(m.shift).label].concat(EVAL_CATS.map(c=>e.scores[c.k]||'—'),[h(e.notes)]);}));
+    extra=rangeBar();
+  }
+  if(S.adminTab==='evalsum'){
+    const cats=S.evalWho==='sup'?SUP_EVAL_CATS:EVAL_CATS;
+    extra=rangeBar()+'<div class="row" style="margin-bottom:8px"><button class="chip'+(S.evalWho!=='sup'?' on':'')+'" data-act="evalwho" data-v="staff">Staff (CT / RC)</button><button class="chip'+(S.evalWho==='sup'?' on':'')+'" data-act="evalwho" data-v="sup">Supervisors</button><span class="muted">averages (means) of every shift evaluation in the period</span></div>';
+    cols=['Name','Role','Shifts evaluated'].concat(cats.map(c=>c.ar),['Average']);
+    rows=evalSummary(S.evalWho,from,to).map(o=>[h(o.name),ROLES[o.role]||'—','<span class="mono">'+o.n+'</span>'].concat(o.avg.map(v=>'<span class="mono">'+f1(v)+'</span>'),['<b class="mono">'+f1(o.overall)+'</b>']));
+  }
+  if(S.adminTab==='daily'){
+    cols=['Date','Filled by','Saved at'].concat(DAILY_FIELDS.map(x=>x.l),['Notes']);
+    rows=DB.d.daily.filter(d=>inRange(d.date,from,to)).sort((a,b)=>b.date.localeCompare(a.date)).map(d=>[fmtDate(d.date),h(d.name),fmtDT(d.at)].concat(DAILY_FIELDS.map(x=>'<span class="mono">'+h(d.data[x.k])+'</span>'),[h(d.notes)]));
+    extra=rangeBar();
+  }
+  if(S.adminTab==='supeval'){ return html+viewSupEval()+'<div style="margin-top:16px">'+back+'</div>'; }
+  if(S.adminTab==='users'){
+    cols=['Name','Employee ID','Role','Password','Active',''];
+    rows=DB.d.users.map(u=>{ const me=u.u===S.user.u;
+      const act = S.resetName===u.name ? '<div class="row"><span class="muted">Temporary password</span><input class="fld" id="reset-temp" value="1234" style="width:110px"><button class="btn sm" data-act="reset-go" data-name="'+h(u.name)+'">Confirm</button><button class="btn o sm" data-act="reset-cancel">Cancel</button></div>'
+        : '<div class="row"><button class="btn o sm" data-act="reset-pw" data-name="'+h(u.name)+'">Reset password</button>'+(me?'':(u.active?'<button class="btn danger sm" data-act="set-active" data-name="'+h(u.name)+'" data-v="0">Deactivate</button>':'<button class="btn o sm" data-act="set-active" data-name="'+h(u.name)+'" data-v="1">Activate</button>'))+'</div>';
+      return [h(u.name),'<span class="mono">'+h(u.empId||'—')+'</span>',ROLES[u.role]||h(u.role), u.mustChange?'<span class="pill pend">TEMP — not changed yet</span>':(u.pwSet?'<span class="pill ok">Set</span>':'<span class="pill late">Empty</span>'), u.active?'<span class="pill ok">Active</span>':'<span class="pill late">Inactive</span>', act]; });
+    extra='<div class="muted" style="margin-bottom:8px">Reset password writes a temporary password into the Setup sheet — the person must choose a new one at next sign-in. Deactivate = cannot sign in; old reports keep the name. New people are added as a row in the Setup sheet.</div>';
+  }
+  if(S.adminTab==='config'){ cols=['ID','Label','Start','End','Overlap','Accepts','Next shift'];
+    rows=SHIFTS.map(s=>[s.id,s.label,s.start,s.end,s.overlap?'Yes':'No',s.accepts.map(a=>shiftOf(a.shift).label+(a.offset?' (prev day)':'')).join(', ')||'—',shiftOf(s.next.shift).label+(s.next.offset?' (next day)':'')]);
+    rows.push(['—','Duration to report submit',GRACE_MIN+' min','','','','']); extra='<div class="muted" style="margin-bottom:8px">Read-only here — edit the Setup tab of the sheet.</div>'; }
+  ADMIN_CUR={cols,rows};
+  html+=extra+tbl(cols,rows);
+  html+='<div class="row" style="margin-top:12px"><button class="btn o sm" data-act="export">Export CSV</button></div>';
+  html+='<div style="margin-top:16px">'+back+'</div>';
+  return html;
+}
+function viewSupEval(){
+  const sups=DB.d.users.filter(u=>u.role==='SUP'&&u.active!==false); const today=DB.today||dateKey(new Date());
+  const se=S.supEval; if(!se.date) se.date=today; if(!se.shift) se.shift=(SHIFTS.find(x=>!x.overlap)||SHIFTS[0]).id;
+  const cur=se.name? DB.d.supEvals.find(e=>e.supervisor===se.name&&e.shift===se.shift&&e.date===se.date) : null;
+  let html='<h2 class="sec">Evaluate supervisor <small>per shift · nine categories · 1 Below average … 5 Beyond job description</small></h2><div class="card">';
+  html+='<div class="row" style="margin-bottom:12px"><select class="fld" data-se="name" style="min-width:240px;width:auto"><option value="">— pick supervisor —</option>'+sups.map(u=>'<option value="'+h(u.name)+'"'+(u.name===se.name?' selected':'')+'>'+h(u.name)+(u.empId?' · '+h(u.empId):'')+'</option>').join('')+'</select>'+
+    '<select class="fld" data-se="shift" style="width:auto">'+SHIFTS.map(x=>'<option value="'+x.id+'"'+(x.id===se.shift?' selected':'')+'>'+h(x.label)+'</option>').join('')+'</select>'+
+    '<input class="fld" type="date" data-se="date" value="'+se.date+'" max="'+today+'" style="width:auto">'+
+    (se.name?(cur?'<span class="pill ok">Saved '+fmtDT(cur.at)+' by '+h(cur.by)+'</span>':'<span class="pill info">Not evaluated yet</span>'):'')+'</div>';
+  if(se.name){
+    const sc=cur?cur.scores:{};
+    html+='<div class="eval" data-emp="'+h(se.name)+'">'+SUP_EVAL_CATS.map(cat=>'<div><div class="ar" style="font-size:13px;color:var(--ink);font-weight:500">'+h(cat.ar)+'</div><span class="muted">'+h(cat.en)+'</span></div><div class="scale" data-cat="'+cat.k+'">'+[1,2,3,4,5].map(n=>'<button type="button" class="'+(Number(sc[cat.k])===n?'on':'')+'" data-act="score" data-n="'+n+'" title="'+SCALE[n]+'">'+n+'</button>').join('')+'</div>').join('')+'</div>'+
+      '<input class="fld" style="margin-top:10px" id="se-notes" placeholder="ملاحظات / Notes" value="'+h(cur?cur.notes:'')+'"><div class="row" style="margin-top:10px;justify-content:flex-end"><button class="btn" data-act="save-supeval">Save evaluation</button></div>';
+  } else html+='<div class="muted">Pick a supervisor to start.</div>';
+  html+='</div>';
+  const recent=DB.d.supEvals.slice().sort((a,b)=>(b.date+b.shift).localeCompare(a.date+a.shift)).slice(0,30);
+  html+='<h2 class="sec">Recent supervisor evaluations</h2>'+tbl(['Date','Shift','Supervisor'].concat(SUP_EVAL_CATS.map(c=>c.ar),['ملاحظات','By']), recent.map(e=>[fmtDate(e.date),shiftOf(e.shift)?shiftOf(e.shift).label:h(e.shift),h(e.supervisor)].concat(SUP_EVAL_CATS.map(c=>e.scores[c.k]||'—'),[h(e.notes),h(e.by)])));
+  ADMIN_CUR={cols:['Date','Shift','Supervisor'].concat(SUP_EVAL_CATS.map(c=>c.ar),['Notes','By']), rows:recent.map(e=>[fmtDate(e.date),e.shift,e.supervisor].concat(SUP_EVAL_CATS.map(c=>e.scores[c.k]||''),[e.notes,e.by]))};
+  return html+'<div class="row" style="margin-top:12px"><button class="btn o sm" data-act="export">Export CSV</button></div>';
+}
+
+/* ---- actions ---- */
+async function doLogin(){
+  const uu=PICK.name||'', pp=($('#in-p')||{value:''}).value;
+  if(!uu){ toast('Pick your name first'); return; } if(!pp){ toast('Enter your password'); return; }
+  setBusy(true);
+  try{
+    const j=await api('login',{username:uu,password:pp});
+    S.user=j.user; S.token=j.token; S.mustChange=!!j.mustChange; S.shift=null; S.shiftDate=null; S.supView='home'; S.adminTab='home'; S.viewRole=null; S.rolePicked=false; applyConfig(j); saveSession();
+    if(j.data) applyData(j.data);
+    setBusy(false); render();
+    if(!S.mustChange && !j.data) await reload();
+  }catch(e){ setBusy(false); toast(e.message); }
+}
+async function doChangePassword(){
+  const a=$('#np1').value, b=$('#np2').value;
+  if(a.length<4){ toast('Password too short'); return; } if(a!==b){ toast('Passwords do not match'); return; }
+  setBusy(true);
+  try{ const j=await api('changePassword',{newPassword:a}); S.token=j.token; S.mustChange=false; saveSession(); if(j.data) applyData(j.data); toast('Password saved'); setBusy(false); render(); if(!j.data) await reload(); }
+  catch(e){ setBusy(false); toast(e.message); }
+}
+function logout(){ STAFF._asked=false; S.viewRole=null; S.rolePicked=false; PICK.name=null; PICK.empId=''; PICK.open=false; S.user=null; S.token=null; S.mustChange=false; S.shift=null; S.shiftDate=null; DB.d={users:[],reports:[],rosters:[],evals:[],daily:[],tickets:[],supEvals:[]}; DB.at=null; saveSession(); render(); }
+document.addEventListener('keydown', e=>{ const k=e.target.dataset&&e.target.dataset.enter; if(e.key==='Enter'&&k){ e.preventDefault(); if(k==='login') doLogin(); if(k==='chpw') doChangePassword(); } });
+document.addEventListener('input', e=>{ if(e.target.id==='staff-q'){ PICK.q=e.target.value; const pos=e.target.selectionStart; render(); const q=$('#staff-q'); if(q){ q.focus(); q.setSelectionRange(pos,pos); } } });
+document.addEventListener('change', e=>{ if(e.target.dataset&&e.target.dataset.t==='type') abandCount();
+  if(e.target.id==='chain-date'){ S.chainDate=e.target.value; render(); }
+  if(e.target.dataset&&e.target.dataset.range){ S[e.target.dataset.range]=e.target.value; render(); }
+  if(e.target.dataset&&e.target.dataset.se){ S.supEval[e.target.dataset.se]=e.target.value; render(); }
+  if(e.target.dataset&&e.target.dataset.r==='name'){ const o=e.target.selectedOptions[0]; const role=o&&o.dataset.role; const rs=e.target.closest('tr').querySelector('[data-r=role]'); if(role&&rs) rs.value=role; }
+  if(e.target.id==='daily-date'){ S.dailyDate=e.target.value; saveSession(); render(); } });
+document.addEventListener('click', e=>{
+  const el=e.target.closest('[data-act]'); if(!el||BUSY) return; const act=el.dataset.act;
+  if(act==='login'){ doLogin(); }
+  if(act==='pick-name'){ PICK.open=!PICK.open; PICK.q=''; render(); if(PICK.open){ const q=$('#staff-q'); q&&q.focus(); } }
+  if(act==='choose-name'){ PICK.name=el.dataset.name; PICK.empId=el.dataset.emp; PICK.open=false; PICK.q=''; render(); const p=$('#in-p'); p&&p.focus(); }
+  if(act==='chpw'){ doChangePassword(); }
+  if(act==='logout'){ logout(); }
+  if(act==='refresh'){ reload(); }
+  if(act==='change-shift'){ S.shift=null; S.shiftDate=null; saveSession(); render(); }
+  if(act==='pick-role'){ S.viewRole=el.dataset.v||null; S.rolePicked=true; S.shift=null; S.shiftDate=null; S.supView='home'; S.adminTab='home'; saveSession(); reload(); }
+  if(act==='switch-role'){ S.rolePicked=false; S.viewRole=null; S.shift=null; S.shiftDate=null; saveSession(); render(); }
+  if(act==='pick-shift'){ S.shift=el.dataset.id; S.shiftDate=currentShiftDate(shiftOf(S.shift),new Date()); if(curRole()==='SUP') S.supView='menu'; saveSession(); render(); }
+  if(act==='accept-all'){ const n=$('#accept-note'); write('acceptMany',{reportIds:el.dataset.ids.split(','),reportRole:el.dataset.role,note:n?n.value.trim():'',myShift:S.shift,myShiftDate:S.shiftDate},'Accepted').then(ok=>{ if(ok&&S.user&&curRole()==='SUP'&&S.supView==='prev'){ S.supView='menu'; saveSession(); render(); } }); }
+  if(act==='ack'){ const r=R().find(x=>x.id===el.dataset.id); if(r&&!ackedBy(r,S.user.u)){ const n=document.querySelector('[data-note="'+r.id+'"]');
+    write('acknowledge',{reportId:r.id,reportRole:r.role,note:n?n.value.trim():''},'Acknowledged'); } }
+  if(act==='add-prob'){ const tb=$('#probs tbody'); const tr=document.createElement('tr'); tr.innerHTML='<td><input class="fld" data-p="problem"></td><td><input class="fld" data-p="action"></td>'; tb.appendChild(tr); }
+  if(act==='submit-report'){ submitReport(); }
+  if(act==='sup-view'){ S.supView=el.dataset.v; saveSession(); render(); window.scrollTo(0,0); }
+  if(act==='add-ticket'){ const tb=$('#tickets tbody'); const tr=document.createElement('tr'); const ty=el.dataset.type;
+    tr.innerHTML='<td><select class="fld" data-t="type">'+['Abandoned','Other'].map(x=>'<option'+(x===ty?' selected':'')+'>'+x+'</option>').join('')+'</select></td><td><input class="fld" data-t="reason" placeholder="'+(ty==='Other'?'What is the issue':'Why was it abandoned')+'"></td><td><input class="fld" data-t="ticketNo" placeholder="—"></td><td><select class="fld" data-t="status">'+TICKET_STATUS.map(x=>'<option'+(x==='No ticket'?' selected':'')+'>'+x+'</option>').join('')+'</select></td><td><button type="button" class="btn o sm" data-act="del-ticket">×</button></td>';
+    tb.appendChild(tr); abandCount(); tr.querySelector('[data-t=reason]').focus(); }
+  if(act==='del-ticket'){ el.closest('tr').remove(); abandCount(); }
+  if(act==='confirm'){ el.closest('.chips').querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b===el)); }
+  if(act==='save-daily'){ saveDaily(); }
+  if(act==='add-roster'){ const tb=$('#roster tbody'); const tr=document.createElement('tr'); tr.innerHTML=rosterRow({name:'',role:'CT',shift:S.shift}).replace(/^<tr>|<\/tr>$/g,''); tb.appendChild(tr); }
+  if(act==='del-row'){ el.closest('tr').remove(); }
+  if(act==='save-roster'){ const members=[...document.querySelectorAll('#roster tbody tr')].map(tr=>({name:tr.querySelector('[data-r=name]').value,role:tr.querySelector('[data-r=role]').value,shift:tr.querySelector('[data-r=shift]').value})).filter(m=>m.name);
+    write('saveRoster',{shift:S.shift,shiftDate:S.shiftDate,members},'Roster saved'); }
+  if(act==='score'){ const sc=el.closest('.scale'); sc.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el)); }
+  if(act==='save-eval'){ const card=el.closest('.card'); const emp=el.dataset.emp; const scores={}; card.querySelectorAll('.scale').forEach(sc=>{ const on=sc.querySelector('button.on'); if(on) scores[sc.dataset.cat]=Number(on.dataset.n); });
+    if(Object.keys(scores).length<EVAL_CATS.length){ toast('Score all five categories'); return; }
+    write('saveEval',{shift:S.shift,shiftDate:S.shiftDate,employee:emp,scores,notes:card.querySelector('[data-ev=notes]').value.trim()},'Evaluation saved'); }
+  if(act==='admin-tab'){ S.adminTab=el.dataset.t; S.tFilter='all'; saveSession(); render(); window.scrollTo(0,0); }
+  if(act==='admin-go'){ S.adminTab=el.dataset.t; S.tFilter={open:'open',noconf:'noconf',late:'late'}[el.dataset.k]||'all'; saveSession(); render(); window.scrollTo(0,0); }
+  if(act==='tfilter'){ S.tFilter=el.dataset.v; render(); }
+  if(act==='evalwho'){ S.evalWho=el.dataset.v; render(); }
+  if(act==='chain-day'){ S.chainDate=addDays(S.chainDate||DB.today||dateKey(new Date()),Number(el.dataset.n)); render(); }
+  if(act==='reset-pw'){ S.resetName=el.dataset.name; render(); const i=$('#reset-temp'); i&&i.focus(); }
+  if(act==='reset-cancel'){ S.resetName=null; render(); }
+  if(act==='reset-go'){ const temp=($('#reset-temp')||{value:'1234'}).value.trim(); S.resetName=null; write('resetPassword',{name:el.dataset.name,temp},'Password reset — temporary: '+temp); }
+  if(act==='set-active'){ write('setActive',{name:el.dataset.name,active:el.dataset.v==='1'},el.dataset.v==='1'?'Activated':'Deactivated'); }
+  if(act==='save-supeval'){ const se=S.supEval; const scores={}; document.querySelectorAll('.eval .scale').forEach(sc=>{ const on=sc.querySelector('button.on'); if(on) scores[sc.dataset.cat]=Number(on.dataset.n); });
+    if(Object.keys(scores).length<SUP_EVAL_CATS.length){ toast('Score all nine categories'); return; }
+    write('saveSupEval',{supervisor:se.name,shift:se.shift,date:se.date,scores,notes:($('#se-notes')||{value:''}).value.trim()},'Supervisor evaluation saved'); }
+  if(act==='export'){ if(ADMIN_CUR) csv(ADMIN_CUR.cols,ADMIN_CUR.rows,'tec_'+S.adminTab+'_'+dateKey(new Date())); }
+});
+function submitReport(){
+  const role=curRole(); const f=FIELDS[role]; const data={};
+  for(const x of f){ const inp=document.querySelector('[data-f="'+x.k+'"]'); const v=inp?inp.value.trim():''; if(v===''){ toast('Fill in: '+x.l); inp&&inp.focus(); return; } data[x.k]= x.text? v : Number(v); }
+  if(myReport()){ toast('You already submitted this shift'); render(); return; }
+  const p={shift:S.shift,shiftDate:S.shiftDate,data};
+  if(role==='CT') p.problems=[...document.querySelectorAll('#probs tbody tr')].map(tr=>({problem:tr.querySelector('[data-p=problem]').value.trim(),action:tr.querySelector('[data-p=action]').value.trim()})).filter(pp=>pp.problem||pp.action);
+  else p.notes=($('#rc-notes')||{value:''}).value.trim();
+  if(role==='SUP'){
+    p.confirms={};
+    p.tickets=[];
+    for(const tr of document.querySelectorAll('#tickets tbody tr')){ const g=k=>tr.querySelector('[data-t='+k+']').value.trim(); const t={type:g('type'),reason:g('reason'),ticketNo:g('ticketNo'),status:g('status')};
+      if(!t.reason){ toast(t.type==='Other'?'Write what the issue is':'Write the abandon justification'); tr.querySelector('[data-t=reason]').focus(); return; }
+      if(t.status!=='No ticket'&&!t.ticketNo){ toast('Enter the ticket number or choose "No ticket"'); tr.querySelector('[data-t=ticketNo]').focus(); return; }
+      p.tickets.push(t); }
+    for(const tr of document.querySelectorAll('#confirms tbody tr')){ const on=tr.querySelector('.chip.on'); if(!on){ toast('Answer all four confirmations (Done / No)'); return; } p.confirms[tr.dataset.c]={done:on.dataset.v==='1', note:tr.querySelector('[data-cn]').value.trim()}; }
+  }
+  write('submit',p,'Report submitted');
+}
+function abandCount(){ const n=$('#aband-n'); if(n) n.textContent=[...document.querySelectorAll('#tickets tbody tr')].filter(tr=>tr.querySelector('[data-t=type]').value==='Abandoned').length; }
+function saveDaily(){
+  const date=($('#daily-date')||{value:''}).value; if(!date){ toast('Choose the date'); return; }
+  if(DB.d.daily.some(d=>d.date===date)){ toast('This date is already saved and locked'); S.dailyDate=date; render(); return; }
+  const data={};
+  for(const x of DAILY_FIELDS){ const inp=document.querySelector('[data-d="'+x.k+'"]'); const v=inp?inp.value.trim():''; if(v===''){ toast('Fill in: '+x.l); inp&&inp.focus(); return; } data[x.k]= x.text? v : Number(v); }
+  S.dailyDate=date; saveSession();
+  write('saveDaily',{date,data,notes:($('#daily-notes')||{value:''}).value.trim()},'Daily report saved');
+}
+
+/* ---- init ---- */
+loadSession(); render();
+if(S.user && !S.mustChange) reload();
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible' && S.user && DB.at && (Date.now()-DB.at.getTime())>60000) reload(); });
+</script>
+</body>
+</html>
